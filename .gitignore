@@ -1,1 +1,5 @@
+# rust compilation output folder
 /target
+
+# sqlx query metadata
+/.sqlx

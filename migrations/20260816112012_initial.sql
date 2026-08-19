@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS lists_users_mapping (
 );
 
 -- Create relations needed for storing known shopping list items
-CREATE TABLE IF NOT EXISTS prefill_item (
+CREATE TABLE IF NOT EXISTS prefill_items (
     id SERIAL PRIMARY KEY,
     en_name TEXT UNIQUE NOT NULL,
     zh_name TEXT UNIQUE NOT NULL,

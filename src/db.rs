@@ -2,7 +2,6 @@ use sqlx::migrate::{MigrateError, Migrator};
 use sqlx::postgres::PgPool;
 use sqlx::{Error, query, query_as};
 use std::path::Path;
-use tower::util::Optional;
 
 pub async fn apply_db_migrations(pool: &PgPool) -> Result<(), MigrateError> {
     let migrator = Migrator::new(Path::new("./migrations")).await?;
@@ -17,7 +16,7 @@ struct User {
     default_list_id: i32,
 }
 
-async fn create_user(pool: &PgPool, new_name: String, new_password: String) -> Option<i32> {
+async fn create_user(pool: &PgPool, new_name: &str, new_password: &str) -> Option<i32> {
     let new_list_id = query!("INSERT INTO lists (name) VALUES ('default') RETURNING id")
         .fetch_one(pool)
         .await
@@ -75,7 +74,7 @@ struct List {
     name: String,
 }
 
-async fn create_list(pool: &PgPool, new_name: String) -> Option<List> {
+async fn create_list(pool: &PgPool, new_name: &str) -> Option<List> {
     query_as!(
         List,
         "INSERT INTO lists (name) VALUES ($1) RETURNING id, name",

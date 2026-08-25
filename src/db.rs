@@ -75,6 +75,17 @@ struct List {
     name: String,
 }
 
+async fn create_list(pool: &PgPool, new_name: String) -> Option<List> {
+    query_as!(
+        List,
+        "INSERT INTO lists (name) VALUES ($1) RETURNING id, name",
+        new_name
+    )
+    .fetch_optional(pool)
+    .await
+    .ok()?
+}
+
 #[derive(Debug)]
 struct Item {
     id: i32,

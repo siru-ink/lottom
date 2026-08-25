@@ -2,6 +2,7 @@ use sqlx::migrate::{MigrateError, Migrator};
 use sqlx::postgres::PgPool;
 use sqlx::{Error, query, query_as};
 use std::path::Path;
+use tower::util::Optional;
 
 pub async fn apply_db_migrations(pool: &PgPool) -> Result<(), MigrateError> {
     let migrator = Migrator::new(Path::new("./migrations")).await?;
@@ -72,4 +73,15 @@ async fn delete_user(pool: &PgPool, user: &User) -> Result<(), Error> {
 struct List {
     id: i32,
     name: String,
+}
+
+#[derive(Debug)]
+struct Item {
+    id: i32,
+    list_id: i32,
+    en_name: String,
+    zh_name: String,
+    de_name: String,
+    img_path: Option<String>,
+    estimated_euro_price: i32,
 }

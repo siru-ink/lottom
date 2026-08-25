@@ -47,10 +47,11 @@ async fn read_user(pool: &PgPool, user_id: i32) -> Option<User> {
 async fn update_user(pool: &PgPool, user: &User) -> Option<User> {
     query_as!(
         User,
-        "UPDATE users SET name = $1, password = $2, default_list_id = $3 RETURNING id, name, password, default_list_id",
+        "UPDATE users SET name = $1, password = $2, default_list_id = $3 WHERE id = $4 RETURNING id, name, password, default_list_id",
         user.name,
         user.password,
-        user.default_list_id
+        user.default_list_id,
+        user.id
     )
     .fetch_optional(pool)
     .await

@@ -67,3 +67,9 @@ async fn delete_user(pool: &PgPool, user: &User) -> Result<(), Error> {
         Err(e) => Err(e),
     }
 }
+
+#[derive(Debug)]
+struct List {
+    id: i32,
+    name: String,
+}

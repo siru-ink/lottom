@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
     list_id INTEGER REFERENCES lists(id),
     en_name TEXT NOT NULL,
-    zh_name TEXT,
-    de_name TEXT,
-    img_path TEXT,
-    estimated_euro_price INTEGER
+    zh_name TEXT NOT NULL,
+    de_name TEXT NOT NULL,
+    img_path TEXT NOT NULL,
+    estimated_euro_price INTEGER NOT NULL
 );
 
 -- Create relations needed for authentication and session management

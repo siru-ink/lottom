@@ -17,17 +17,16 @@ struct User {
 }
 
 async fn create_user(pool: &PgPool, new_name: &str, new_password: &str) -> Option<i32> {
-    let new_list_id = query!("INSERT INTO lists (name) VALUES ('default') RETURNING id")
-        .fetch_one(pool)
-        .await
-        .ok()?
-        .id;
+    let new_list = match create_list(pool, "default").await {
+        Some(val) => val,
+        None => return None,
+    };
 
     let new_user_id = query!(
         "INSERT INTO users (name, password, default_list_id) VALUES ($1, $2, $3) RETURNING id",
         new_name,
         new_password,
-        new_list_id
+        new_list.id
     )
     .fetch_one(pool)
     .await

@@ -1,6 +1,6 @@
 use sqlx::migrate::{MigrateError, Migrator};
 use sqlx::postgres::PgPool;
-use sqlx::{query, query_as};
+use sqlx::{Error, query, query_as};
 use std::path::Path;
 
 pub async fn apply_db_migrations(pool: &PgPool) -> Result<(), MigrateError> {
@@ -55,4 +55,14 @@ async fn update_user(pool: &PgPool, user: &User) -> Option<User> {
     .fetch_optional(pool)
     .await
     .ok()?
+}
+
+async fn delete_user(pool: &PgPool, user: &User) -> Result<(), Error> {
+    match query!("DELETE FROM users WHERE id = $1", user.id)
+        .execute(pool)
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
+    }
 }

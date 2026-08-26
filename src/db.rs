@@ -84,6 +84,13 @@ async fn create_list(pool: &PgPool, new_name: &str) -> Option<List> {
     .ok()?
 }
 
+async fn read_list(pool: &PgPool, list_id: i32) -> Option<List> {
+    query_as!(List, "SELECT * FROM lists WHERE id = $1", list_id)
+        .fetch_optional(pool)
+        .await
+        .ok()?
+}
+
 #[derive(Debug)]
 struct Item {
     id: i32,

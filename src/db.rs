@@ -123,3 +123,43 @@ struct Item {
     img_path: Option<String>,
     estimated_euro_price: i32,
 }
+
+async fn create_item(
+    pool: &PgPool,
+    new_list_id: i32,
+    new_en_name: String,
+    new_zh_name: String,
+    new_de_name: String,
+    optional_new_img_path: Option<String>,
+    new_estimated_euro_price: i32,
+) -> Option<Item> {
+    match optional_new_img_path {
+        None => {
+            query_as!(
+                Item,
+                "INSERT INTO items (list_id, en_name, zh_name, de_name, estimated_euro_price) \
+                 VALUES ($1, $2, $3, $4, $5) \
+                 RETURNING id, list_id, en_name, zh_name, de_name, img_path, estimated_euro_price",
+                new_list_id,
+                new_en_name,
+                new_zh_name,
+                new_de_name,
+                new_estimated_euro_price
+            ).fetch_optional(pool).await.ok()?
+        }
+        Some(new_img_path) => {
+            query_as!(
+                Item,
+                "INSERT INTO items (list_id, en_name, zh_name, de_name, img_path, estimated_euro_price) \
+                 VALUES ($1, $2, $3, $4, $5, $6) \
+                 RETURNING id, list_id, en_name, zh_name, de_name, img_path, estimated_euro_price",
+                new_list_id,
+                new_en_name,
+                new_zh_name,
+                new_de_name,
+                new_img_path,
+                new_estimated_euro_price
+            ).fetch_optional(pool).await.ok()?
+        }
+    }
+}

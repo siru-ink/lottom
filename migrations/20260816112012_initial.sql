@@ -5,11 +5,11 @@ CREATE TABLE IF NOT EXISTS lists (
 );
 CREATE TABLE IF NOT EXISTS items (
     id SERIAL PRIMARY KEY,
-    list_id INTEGER REFERENCES lists(id),
+    list_id INTEGER REFERENCES lists(id) NOT NULL,
     en_name TEXT NOT NULL,
     zh_name TEXT NOT NULL,
     de_name TEXT NOT NULL,
-    img_path TEXT NOT NULL,
+    img_path TEXT UNIQUE,
     estimated_euro_price INTEGER NOT NULL
 );
 

@@ -187,3 +187,13 @@ async fn update_item(pool: &PgPool, item: Item) -> Option<Item> {
         item.id
     ).fetch_optional(pool).await.ok()?
 }
+
+async fn delete_item(pool: &PgPool, item: &Item) -> Result<(), Error> {
+    match query!("DELETE FROM items WHERE id = $1", item.id)
+        .execute(pool)
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(e),
+    }
+}

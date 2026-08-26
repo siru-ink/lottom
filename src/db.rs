@@ -91,6 +91,18 @@ async fn read_list(pool: &PgPool, list_id: i32) -> Option<List> {
         .ok()?
 }
 
+async fn update_list(pool: &PgPool, list: &List) -> Option<List> {
+    query_as!(
+        List,
+        "UPDATE lists SET name = $1 WHERE id = $2 RETURNING id,name",
+        list.name,
+        list.id
+    )
+    .fetch_optional(pool)
+    .await
+    .ok()?
+}
+
 #[derive(Debug)]
 struct Item {
     id: i32,

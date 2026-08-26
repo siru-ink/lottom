@@ -163,3 +163,10 @@ async fn create_item(
         }
     }
 }
+
+async fn read_item(pool: &PgPool, item_id: i32) -> Option<Item> {
+    query_as!(Item, "SELECT * FROM items WHERE id = $1", item_id)
+        .fetch_optional(pool)
+        .await
+        .ok()?
+}

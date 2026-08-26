@@ -170,3 +170,20 @@ async fn read_item(pool: &PgPool, item_id: i32) -> Option<Item> {
         .await
         .ok()?
 }
+
+async fn update_item(pool: &PgPool, item: Item) -> Option<Item> {
+    query_as!(
+        Item,
+        "UPDATE items \
+         SET list_id = $1, en_name = $2, zh_name = $3, de_name = $4, img_path = $5, estimated_euro_price = $6 \
+         WHERE id = $7 \
+         RETURNING id, list_id, en_name, zh_name, de_name, img_path, estimated_euro_price",
+        item.list_id,
+        item.en_name,
+        item.zh_name,
+        item.de_name,
+        item.img_path,
+        item.estimated_euro_price,
+        item.id
+    ).fetch_optional(pool).await.ok()?
+}

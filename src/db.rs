@@ -127,10 +127,10 @@ struct Item {
 async fn create_item(
     pool: &PgPool,
     new_list_id: i32,
-    new_en_name: String,
-    new_zh_name: String,
-    new_de_name: String,
-    optional_new_img_path: Option<String>,
+    new_en_name: &String,
+    new_zh_name: &String,
+    new_de_name: &String,
+    optional_new_img_path: &Option<String>,
     new_estimated_euro_price: i32,
 ) -> Option<Item> {
     match optional_new_img_path {
@@ -171,7 +171,7 @@ async fn read_item(pool: &PgPool, item_id: i32) -> Option<Item> {
         .ok()?
 }
 
-async fn update_item(pool: &PgPool, item: Item) -> Option<Item> {
+async fn update_item(pool: &PgPool, item: &Item) -> Option<Item> {
     query_as!(
         Item,
         "UPDATE items \

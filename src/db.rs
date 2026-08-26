@@ -103,6 +103,16 @@ async fn update_list(pool: &PgPool, list: &List) -> Option<List> {
     .ok()?
 }
 
+async fn delete_list(pool: &PgPool, list: &List) -> Result<(), Error> {
+    match query!("DELETE FROM lists WHERE id = $1", list.id)
+        .execute(pool)
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(e),
+    }
+}
+
 #[derive(Debug)]
 struct Item {
     id: i32,

@@ -3,3 +3,6 @@
 
 # sqlx query metadata
 /.sqlx
+
+# Local cargo configuration
+/.cargo/config.toml

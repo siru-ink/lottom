@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = { version = "0.8.9", features = ["macros"] }
+serde = "1.0.229"
 sqlx = { version = "0.9.0", features = ["runtime-tokio", "postgres"] }
 tera = { version = "2.1.1", features = ["fast", "glob_fs"] }
 tokio = { version = "1.53.1", features = ["full"] }

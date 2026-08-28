@@ -231,3 +231,10 @@ async fn create_session(pool: &PgPool, user: &User) -> Optional<Session> {
     .await
     .ok()?
 }
+
+async fn read_session(pool: &PgPool, session_id: i32) -> Option<Session> {
+    query_as!(Session, "SELECT * FROM sessions WHERE id = $1", session_id)
+        .fetch_optional(pool)
+        .await
+        .ok()?
+}

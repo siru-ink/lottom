@@ -3,22 +3,27 @@ use axum::middleware::{Next, from_fn};
 use axum::response::Response;
 use axum::routing::get;
 use axum::{Router, serve};
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use std::env::var;
 use std::error::Error;
 use std::fmt::Display;
 use std::sync::Arc;
+use std::sync::OnceLock;
 use tera::Tera;
 use tokio::{main, net::TcpListener};
 use tower::ServiceBuilder;
+use tower_cookies::{CookieManagerLayer, Key};
 
 mod auth;
 mod db;
 
 struct AppState {
-    _pg_pool: PgPool,
+    pg_pool: PgPool,
     tera: Tera,
 }
+
+static COOKIEKEY: OnceLock<Key> = OnceLock::new();
 
 #[main]
 async fn main() -> () {
@@ -29,6 +34,21 @@ async fn main() -> () {
             return;
         }
     };
+
+    let key_bytes = match BASE64.decode(config_values.cookiekey) {
+        Ok(val) => val,
+        Err(e) => {
+            println!(
+                "Error decoding the COOKIEKEY env variable from base64: {}",
+                e
+            );
+            return;
+        }
+    };
+    if let Err(_) = COOKIEKEY.set(Key::from(&key_bytes)) {
+        println!("Error initializing encrypted cookies key.");
+        return;
+    }
 
     let postgres_connection_string = format!(
         "postgresql://{}:{}@{}:{}/{}",
@@ -55,14 +75,18 @@ async fn main() -> () {
         .expect("Tera should be able to load templates from <templates/>.");
 
     let appstate = Arc::new(AppState {
-        _pg_pool: pool,
+        pg_pool: pool,
         tera: tera,
     });
 
     let app = Router::new()
         .route("/", get(index))
         .nest("/auth", auth::get_routes())
-        .layer(ServiceBuilder::new().layer(from_fn(logger)))
+        .layer(
+            ServiceBuilder::new()
+                .layer(from_fn(logger))
+                .layer(CookieManagerLayer::new()),
+        )
         .with_state(appstate);
 
     let listener = TcpListener::bind("0.0.0.0:11000").await.unwrap();
@@ -81,6 +105,7 @@ struct EnvConfig {
     postgres_address: String,
     postgres_port: String,
     postgres_database_name: String,
+    cookiekey: String,
 }
 
 #[derive(Debug)]
@@ -90,6 +115,7 @@ enum EnvConfigError {
     MissingPostgresAddress,
     MissingPostgresPort,
     MissingPostgresDatabaseName,
+    MissingCookieKeyValue,
 }
 
 impl Display for EnvConfigError {
@@ -109,6 +135,9 @@ impl Display for EnvConfigError {
             }
             EnvConfigError::MissingPostgresDatabaseName => {
                 write!(f, "Missing POSTGRES_DATABASE_NAME env variable.")
+            }
+            EnvConfigError::MissingCookieKeyValue => {
+                write!(f, "Missing COOKIEKEY env variable.")
             }
         }
     }
@@ -137,6 +166,10 @@ fn get_env() -> Result<EnvConfig, EnvConfigError> {
         Ok(val) => val,
         Err(_) => return Err(EnvConfigError::MissingPostgresDatabaseName),
     };
+    let cookiekey = match var("COOKIEKEY") {
+        Ok(val) => val,
+        Err(_) => return Err(EnvConfigError::MissingCookieKeyValue),
+    };
 
     Ok(EnvConfig {
         postgres_username: postgres_username,
@@ -144,6 +177,7 @@ fn get_env() -> Result<EnvConfig, EnvConfigError> {
         postgres_address: postgres_address,
         postgres_port: postgres_port,
         postgres_database_name: postgres_database_name,
+        cookiekey: cookiekey,
     })
 }
 

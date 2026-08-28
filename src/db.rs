@@ -215,13 +215,19 @@ async fn delete_item(pool: &PgPool, item: &Item) -> Result<(), Error> {
 }
 
 #[derive(Debug)]
-struct Session {
+pub struct Session {
     id: i32,
     user_id: i32,
     start: DateTime<Utc>,
 }
 
-async fn create_session(pool: &PgPool, user: &User) -> Option<Session> {
+impl Session {
+    pub fn get_cookie_reference(&self) -> i32 {
+        self.id
+    }
+}
+
+pub async fn create_session(pool: &PgPool, user: &User) -> Option<Session> {
     query_as!(
         Session,
         "INSERT INTO sessions (user_id, start) VALUES ($1, now()) RETURNING id, user_id, start",

@@ -254,3 +254,13 @@ async fn update_session(pool: &PgPool, session: &Session) -> Option<Session> {
     .await
     .ok()?
 }
+
+async fn delete_session(pool: &PgPool, session: &Session) -> Result<(), Error> {
+    match query!("DELETE FROM sessions WHERE id = $1", session.id)
+        .execute(pool)
+        .await
+    {
+        Ok(_) => Ok(()),
+        Err(e) => Err(e),
+    }
+}

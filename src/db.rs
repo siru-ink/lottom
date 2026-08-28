@@ -238,3 +238,19 @@ async fn read_session(pool: &PgPool, session_id: i32) -> Option<Session> {
         .await
         .ok()?
 }
+
+async fn update_session(pool: &PgPool, session: &Session) -> Option<Session> {
+    query_as!(
+        Session,
+        "UPDATE sessions \
+         SET user_id = $1, start = $2 \
+         WHERE id = $3 \
+         RETURNING id, user_id, start",
+        session.user_id,
+        session.start,
+        session.id
+    )
+    .fetch_optional(pool)
+    .await
+    .ok()?
+}

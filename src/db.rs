@@ -220,3 +220,14 @@ struct Session {
     user_id: i32,
     start: DateTime<Utc>,
 }
+
+async fn create_session(pool: &PgPool, user: &User) -> Optional<Session> {
+    query_as!(
+        Session,
+        "INSERT INTO sessions (user_id, start) VALUES ($1, now())",
+        user.id
+    )
+    .fetch_optional(pool)
+    .await
+    .ok()?
+}

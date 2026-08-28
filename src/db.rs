@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use sqlx::migrate::{MigrateError, Migrator};
 use sqlx::postgres::PgPool;
 use sqlx::{Error, query, query_as};
@@ -211,4 +212,11 @@ async fn delete_item(pool: &PgPool, item: &Item) -> Result<(), Error> {
         Ok(_) => Ok(()),
         Err(e) => return Err(e),
     }
+}
+
+#[derive(Debug)]
+struct Session {
+    id: i32,
+    user_id: i32,
+    start: DateTime<Utc>,
 }

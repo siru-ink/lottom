@@ -18,6 +18,7 @@ use tower_cookies::{CookieManagerLayer, Cookies, Key};
 use crate::auth::check_authorization;
 
 mod auth;
+mod cookies;
 mod db;
 mod list;
 

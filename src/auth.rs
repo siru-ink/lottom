@@ -1,8 +1,9 @@
+use crate::cookies::{CookieType, remove_cookie, set_cookie};
 use crate::db::PasswordCheckResult;
 use crate::{AppState, db};
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Redirect};
+use axum::response::{Html, IntoResponse, Redirect, Response};
 use axum::routing::get;
 use axum::{Form, Router};
 use serde::Deserialize;
@@ -61,36 +62,29 @@ async fn post_login(
         Some(new_session) => new_session,
         None => return Redirect::to("/auth/login"),
     };
+
     // Store the session id as a private cookie
-    let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
-    encrypted_cookie_jar.add(
-        Cookie::build(("session_id", new_session.get_cookie_reference().to_string()))
-            .domain("localhost")
-            .path("/")
-            .max_age(Duration::days(7))
-            .secure(false)
-            .http_only(true)
-            .same_site(SameSite::Strict)
-            .build(),
-    );
+    match set_cookie(
+        CookieType::SessionID(new_session.get_cookie_reference()),
+        cookies,
+    ) {
+        Ok(_) => _,
+        Err(e) => return Redirect::to("/auth/login"),
+    };
+
     // Redirect to index
     Redirect::to("/")
 }
 
-async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> impl IntoResponse {
-    let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
-    encrypted_cookie_jar.remove(
-        Cookie::build(("session_id", ""))
-            .domain("localhost")
-            .path("/")
-            .max_age(Duration::days(7))
-            .secure(false)
-            .http_only(true)
-            .same_site(SameSite::Strict)
-            .build(),
-    );
+async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> Response {
+    let description = match remove_cookie(CookieType::SessionID(0), cookies) {
+        Ok(_) => "Finished logging out. Have a nice day.",
+        Err(_) => "Logging out failed. Please try again.",
+    };
 
-    let context = context! {};
+    let context = context! {
+        message => description
+    };
     match appstate.tera.render("logout.html", &context) {
         Ok(val) => Html(val).into_response(),
         Err(_) => {

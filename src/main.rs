@@ -1,6 +1,6 @@
-use axum::extract::Request;
+use axum::extract::{Request, State};
 use axum::middleware::{Next, from_fn};
-use axum::response::Response;
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::get;
 use axum::{Router, serve};
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
@@ -13,7 +13,9 @@ use std::sync::OnceLock;
 use tera::Tera;
 use tokio::{main, net::TcpListener};
 use tower::ServiceBuilder;
-use tower_cookies::{CookieManagerLayer, Key};
+use tower_cookies::{CookieManagerLayer, Cookies, Key};
+
+use crate::auth::check_authorization;
 
 mod auth;
 mod db;
@@ -181,6 +183,9 @@ fn get_env() -> Result<EnvConfig, EnvConfigError> {
     })
 }
 
-async fn index() -> &'static str {
-    "Hello, world!"
+async fn index(cookies: Cookies, State(appstate): State<Arc<AppState>>) -> Response {
+    if !check_authorization(&cookies, &appstate.pg_pool).await {
+        return Redirect::to("/auth/login").into_response();
+    }
+    "Hello, world!".into_response()
 }

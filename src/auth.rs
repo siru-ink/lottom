@@ -6,6 +6,8 @@ use axum::response::{Html, IntoResponse, Redirect};
 use axum::routing::get;
 use axum::{Form, Router};
 use serde::Deserialize;
+use sqlx::PgPool;
+use sqlx::query;
 use std::sync::Arc;
 use tera::context;
 use tower_cookies::cookie::SameSite;
@@ -75,8 +77,74 @@ async fn post_login(
     Redirect::to("/")
 }
 
-async fn get_logout() -> &'static str {
-    "This is the logout page."
+async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> impl IntoResponse {
+    let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
+    encrypted_cookie_jar.remove(
+        Cookie::build(("session_id", ""))
+            .domain("localhost")
+            .path("/")
+            .max_age(Duration::days(7))
+            .secure(false)
+            .http_only(true)
+            .same_site(SameSite::Strict)
+            .build(),
+    );
+
+    let context = context! {};
+    match appstate.tera.render("logout.html", &context) {
+        Ok(val) => Html(val).into_response(),
+        Err(_) => {
+            println!("Error rendering the login.html template.");
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error rendering template.",
+            )
+                .into_response();
+        }
+    }
+}
+
+pub async fn check_authorization(cookies: &Cookies, pool: &PgPool) -> bool {
+    let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
+    let session_id_cookie = match encrypted_cookie_jar.get("session_id") {
+        Some(session_id_cookie) => session_id_cookie,
+        None => return false,
+    };
+    let session_id = match session_id_cookie.value().parse::<i32>() {
+        Ok(number) => number,
+        Err(_) => {
+            encrypted_cookie_jar.remove(
+                Cookie::build(("session_id", ""))
+                    .domain("localhost")
+                    .path("/")
+                    .max_age(Duration::days(7))
+                    .secure(false)
+                    .http_only(true)
+                    .same_site(SameSite::Strict)
+                    .build(),
+            );
+            return false;
+        }
+    };
+    match query!("SELECT * FROM sessions WHERE id = $1", session_id)
+        .fetch_optional(pool)
+        .await
+    {
+        Ok(_) => true,
+        Err(_) => {
+            encrypted_cookie_jar.remove(
+                Cookie::build(("session_id", ""))
+                    .domain("localhost")
+                    .path("/")
+                    .max_age(Duration::days(7))
+                    .secure(false)
+                    .http_only(true)
+                    .same_site(SameSite::Strict)
+                    .build(),
+            );
+            false
+        }
+    }
 }
 
 pub fn get_routes() -> Router<Arc<AppState>> {

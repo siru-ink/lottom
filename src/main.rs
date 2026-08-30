@@ -19,6 +19,7 @@ use crate::auth::check_authorization;
 
 mod auth;
 mod db;
+mod list;
 
 struct AppState {
     pg_pool: PgPool,
@@ -84,6 +85,7 @@ async fn main() -> () {
     let app = Router::new()
         .route("/", get(index))
         .nest("/auth", auth::get_routes())
+        .nest("/list", list::get_routes())
         .layer(
             ServiceBuilder::new()
                 .layer(from_fn(logger))

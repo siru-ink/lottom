@@ -1,19 +1,18 @@
+use crate::AppState;
 use crate::cookies::{CookieType, remove_cookie, set_cookie};
 use crate::db::PasswordCheckResult;
-use crate::{AppState, db};
-use axum::extract::State;
-use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Redirect, Response};
-use axum::routing::get;
-use axum::{Form, Router};
+use axum::{
+    Form, Router,
+    extract::State,
+    http::StatusCode,
+    response::{Html, IntoResponse, Redirect, Response},
+    routing::get,
+};
 use serde::Deserialize;
-use sqlx::PgPool;
-use sqlx::query;
+use sqlx::{PgPool, query};
 use std::sync::Arc;
 use tera::context;
-use tower_cookies::cookie::SameSite;
-use tower_cookies::cookie::time::Duration;
-use tower_cookies::{Cookie, Cookies};
+use tower_cookies::Cookies;
 
 #[derive(Deserialize)]
 struct LoginForm {
@@ -98,48 +97,48 @@ async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> 
     }
 }
 
-pub async fn check_authorization(cookies: &Cookies, pool: &PgPool) -> bool {
-    let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
-    let session_id_cookie = match encrypted_cookie_jar.get("session_id") {
-        Some(session_id_cookie) => session_id_cookie,
-        None => return false,
-    };
-    let session_id = match session_id_cookie.value().parse::<i32>() {
-        Ok(number) => number,
-        Err(_) => {
-            encrypted_cookie_jar.remove(
-                Cookie::build(("session_id", ""))
-                    .domain("localhost")
-                    .path("/")
-                    .max_age(Duration::days(7))
-                    .secure(false)
-                    .http_only(true)
-                    .same_site(SameSite::Strict)
-                    .build(),
-            );
-            return false;
-        }
-    };
-    match query!("SELECT * FROM sessions WHERE id = $1", session_id)
-        .fetch_optional(pool)
-        .await
-    {
-        Ok(_) => true,
-        Err(_) => {
-            encrypted_cookie_jar.remove(
-                Cookie::build(("session_id", ""))
-                    .domain("localhost")
-                    .path("/")
-                    .max_age(Duration::days(7))
-                    .secure(false)
-                    .http_only(true)
-                    .same_site(SameSite::Strict)
-                    .build(),
-            );
-            false
-        }
-    }
-}
+// pub async fn check_authorization(cookies: &Cookies, pool: &PgPool) -> bool {
+//     let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
+//     let session_id_cookie = match encrypted_cookie_jar.get("session_id") {
+//         Some(session_id_cookie) => session_id_cookie,
+//         None => return false,
+//     };
+//     let session_id = match session_id_cookie.value().parse::<i32>() {
+//         Ok(number) => number,
+//         Err(_) => {
+//             encrypted_cookie_jar.remove(
+//                 Cookie::build(("session_id", ""))
+//                     .domain("localhost")
+//                     .path("/")
+//                     .max_age(Duration::days(7))
+//                     .secure(false)
+//                     .http_only(true)
+//                     .same_site(SameSite::Strict)
+//                     .build(),
+//             );
+//             return false;
+//         }
+//     };
+//     match query!("SELECT * FROM sessions WHERE id = $1", session_id)
+//         .fetch_optional(pool)
+//         .await
+//     {
+//         Ok(_) => true,
+//         Err(_) => {
+//             encrypted_cookie_jar.remove(
+//                 Cookie::build(("session_id", ""))
+//                     .domain("localhost")
+//                     .path("/")
+//                     .max_age(Duration::days(7))
+//                     .secure(false)
+//                     .http_only(true)
+//                     .same_site(SameSite::Strict)
+//                     .build(),
+//             );
+//             false
+//         }
+//     }
+// }
 
 pub fn get_routes() -> Router<Arc<AppState>> {
     Router::new()

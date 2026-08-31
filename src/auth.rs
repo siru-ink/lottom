@@ -1,147 +1,75 @@
-use crate::AppState;
-use crate::cookies::{CookieType, remove_cookie, set_cookie};
-use crate::db::PasswordCheckResult;
+use crate::db::session::Session;
+use crate::db::user::User;
+use crate::{AppState, cookies::CookieValue};
 use axum::{
-    Form, Router,
-    extract::State,
-    http::StatusCode,
-    response::{Html, IntoResponse, Redirect, Response},
-    routing::get,
+    extract::{FromRequestParts, State},
+    http::request::Parts,
+    response::{IntoResponse, Redirect, Response},
 };
-use serde::Deserialize;
-use sqlx::{PgPool, query};
 use std::sync::Arc;
-use tera::context;
 use tower_cookies::Cookies;
 
-#[derive(Deserialize)]
-struct LoginForm {
-    user_id: String,
-    password: String,
+#[derive(Debug)]
+pub struct AuthenticatedUser {
+    user: User,
 }
 
-async fn get_login(State(appstate): State<Arc<AppState>>) -> impl IntoResponse {
-    let context = context! {};
-    match appstate.tera.render("login.html", &context) {
-        Ok(val) => Html(val).into_response(),
-        Err(_) => {
-            println!("Error rendering the login.html template.");
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error rendering template.",
-            )
-                .into_response();
+#[derive(Debug)]
+pub enum AuthenticationError {
+    MissingSessionIDCookie,
+    ExtractingCookiesFailed,
+    AppStateRetrievalFailed,
+    ReferencedSessionNotInDB,
+    ReferencedUserNotInDB,
+}
+
+impl IntoResponse for AuthenticationError {
+    fn into_response(self) -> Response {
+        match self {
+            _ => Redirect::to("/auth/login").into_response(),
         }
     }
 }
 
-#[axum::debug_handler]
-async fn post_login(
-    State(appstate): State<Arc<AppState>>,
-    cookies: Cookies,
-    Form(login_form): Form<LoginForm>,
-) -> impl IntoResponse {
-    let user_id: i32 = match login_form.user_id.parse() {
-        Ok(number) => number,
-        Err(_) => return Redirect::to("/auth/login"),
-    };
+impl<S> FromRequestParts<S> for AuthenticatedUser
+where
+    S: Send + Sync,
+    State<Arc<AppState>>: FromRequestParts<S>,
+{
+    type Rejection = AuthenticationError;
 
-    let user = match db::read_user(&appstate.pg_pool, user_id).await {
-        Some(user) => user,
-        None => return Redirect::to("/auth/login"),
-    };
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let cookie_jar = match Cookies::from_request_parts(parts, state).await {
+            Ok(val) => val,
+            Err(_) => return Err(AuthenticationError::ExtractingCookiesFailed),
+        };
 
-    let _ = match user.check_password(&login_form.password) {
-        PasswordCheckResult::Valid => (),
-        PasswordCheckResult::Invalid => return Redirect::to("/auth/login"),
-    };
+        let session_id_cookie = match crate::cookies::CookieKey::SessionID.get(cookie_jar) {
+            Ok(cookie) => cookie,
+            Err(_) => return Err(AuthenticationError::ExtractingCookiesFailed),
+        };
 
-    // Create a new session
-    let new_session = match db::create_session(&appstate.pg_pool, &user).await {
-        Some(new_session) => new_session,
-        None => return Redirect::to("/auth/login"),
-    };
+        let session_id = match session_id_cookie {
+            CookieValue::SessionID(id) => id,
+            // _ => return Err(AuthenticationError::ExtractingCookiesFailed),  // should never occur
+        };
 
-    // Store the session id as a private cookie
-    match set_cookie(
-        CookieType::SessionID(new_session.get_cookie_reference()),
-        cookies,
-    ) {
-        Ok(_) => _,
-        Err(e) => return Redirect::to("/auth/login"),
-    };
+        let State(appstate): State<Arc<AppState>> =
+            match State::from_request_parts(parts, state).await {
+                Ok(val) => val,
+                Err(_) => return Err(AuthenticationError::AppStateRetrievalFailed),
+            };
 
-    // Redirect to index
-    Redirect::to("/")
-}
+        let session = match Session::read(&appstate.pg_pool, session_id).await {
+            Some(session) => session,
+            None => return Err(AuthenticationError::ReferencedSessionNotInDB),
+        };
 
-async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> Response {
-    let description = match remove_cookie(CookieType::SessionID(0), cookies) {
-        Ok(_) => "Finished logging out. Have a nice day.",
-        Err(_) => "Logging out failed. Please try again.",
-    };
+        let user = match session.get_user(&appstate.pg_pool).await {
+            Some(user) => user,
+            None => return Err(AuthenticationError::ReferencedUserNotInDB),
+        };
 
-    let context = context! {
-        message => description
-    };
-    match appstate.tera.render("logout.html", &context) {
-        Ok(val) => Html(val).into_response(),
-        Err(_) => {
-            println!("Error rendering the login.html template.");
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Error rendering template.",
-            )
-                .into_response();
-        }
+        Ok(AuthenticatedUser { user: user })
     }
-}
-
-// pub async fn check_authorization(cookies: &Cookies, pool: &PgPool) -> bool {
-//     let encrypted_cookie_jar = cookies.private(crate::COOKIEKEY.get().unwrap());
-//     let session_id_cookie = match encrypted_cookie_jar.get("session_id") {
-//         Some(session_id_cookie) => session_id_cookie,
-//         None => return false,
-//     };
-//     let session_id = match session_id_cookie.value().parse::<i32>() {
-//         Ok(number) => number,
-//         Err(_) => {
-//             encrypted_cookie_jar.remove(
-//                 Cookie::build(("session_id", ""))
-//                     .domain("localhost")
-//                     .path("/")
-//                     .max_age(Duration::days(7))
-//                     .secure(false)
-//                     .http_only(true)
-//                     .same_site(SameSite::Strict)
-//                     .build(),
-//             );
-//             return false;
-//         }
-//     };
-//     match query!("SELECT * FROM sessions WHERE id = $1", session_id)
-//         .fetch_optional(pool)
-//         .await
-//     {
-//         Ok(_) => true,
-//         Err(_) => {
-//             encrypted_cookie_jar.remove(
-//                 Cookie::build(("session_id", ""))
-//                     .domain("localhost")
-//                     .path("/")
-//                     .max_age(Duration::days(7))
-//                     .secure(false)
-//                     .http_only(true)
-//                     .same_site(SameSite::Strict)
-//                     .build(),
-//             );
-//             false
-//         }
-//     }
-// }
-
-pub fn get_routes() -> Router<Arc<AppState>> {
-    Router::new()
-        .route("/login", get(get_login).post(post_login))
-        .route("/logout", get(get_logout))
 }

@@ -1,4 +1,4 @@
-use crate::db::user::User;
+use crate::{cookies::CookieValue, db::user::User};
 use chrono::{DateTime, Utc};
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
@@ -10,8 +10,12 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn get_cookie_reference(&self) -> String {
-        self.id.to_string()
+    pub fn as_cookie_value(&self) -> CookieValue {
+        CookieValue::SessionID(self.id)
+    }
+
+    pub async fn get_user(&self, pool: &PgPool) -> Option<User> {
+        User::read(pool, self.user_id).await
     }
 
     pub async fn create(pool: &PgPool, user: &User) -> Option<Session> {

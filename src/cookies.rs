@@ -86,6 +86,7 @@ pub enum CookieKey {
 pub enum CookieRetrievalError {
     CookieJarPasswordInaccessible,
     CookieNotInJar,
+    CookieValueNotParseable,
 }
 
 impl std::error::Error for CookieRetrievalError {}
@@ -99,6 +100,12 @@ impl std::fmt::Display for CookieRetrievalError {
             CookieRetrievalError::CookieNotInJar => {
                 write!(f, "requested cookie not found in request/cookie jar")
             }
+            CookieRetrievalError::CookieValueNotParseable => {
+                write!(
+                    f,
+                    "cookie value not according to expected data type and content"
+                )
+            }
         }
     }
 }
@@ -110,7 +117,7 @@ impl CookieKey {
         }
     }
 
-    fn get(&self, cookie_jar: Cookies) -> Result<Cookie, CookieRetrievalError> {
+    pub fn get(&self, cookie_jar: Cookies) -> Result<CookieValue, CookieRetrievalError> {
         let cookie_jar_password = match crate::COOKIEKEY.get() {
             Some(passwd) => passwd,
             None => return Err(CookieRetrievalError::CookieJarPasswordInaccessible),
@@ -123,6 +130,17 @@ impl CookieKey {
             None => return Err(CookieRetrievalError::CookieNotInJar),
         };
 
-        Ok(cookie)
+        let parsed_cookie = match self {
+            Self::SessionID => {
+                let session_id = match cookie.value().parse::<i32>() {
+                    Ok(id) => id,
+                    Err(_) => return Err(CookieRetrievalError::CookieValueNotParseable),
+                };
+
+                CookieValue::SessionID(session_id)
+            }
+        };
+
+        Ok(parsed_cookie)
     }
 }

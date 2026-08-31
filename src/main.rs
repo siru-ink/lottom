@@ -1,8 +1,7 @@
-use axum::extract::{Request, State};
+use axum::extract::Request;
 use axum::middleware::{Next, from_fn};
-use axum::response::{IntoResponse, Redirect, Response};
-use axum::routing::get;
-use axum::{Router, serve};
+use axum::response::Response;
+use axum::serve;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use std::env::var;
@@ -13,14 +12,12 @@ use std::sync::OnceLock;
 use tera::Tera;
 use tokio::{main, net::TcpListener};
 use tower::ServiceBuilder;
-use tower_cookies::{CookieManagerLayer, Cookies, Key};
-
-use crate::auth::check_authorization;
+use tower_cookies::{CookieManagerLayer, Key};
 
 mod auth;
 mod cookies;
 mod db;
-mod list;
+mod routing;
 
 struct AppState {
     pg_pool: PgPool,
@@ -83,10 +80,7 @@ async fn main() -> () {
         tera: tera,
     });
 
-    let app = Router::new()
-        .route("/", get(index))
-        .nest("/auth", auth::get_routes())
-        .nest("/list", list::get_routes())
+    let app = routing::get_routes()
         .layer(
             ServiceBuilder::new()
                 .layer(from_fn(logger))
@@ -94,7 +88,7 @@ async fn main() -> () {
         )
         .with_state(appstate);
 
-    let listener = TcpListener::bind("0.0.0.0:11000").await.unwrap();
+    let listener = TcpListener::bind("0.0.0.0:8150").await.unwrap();
 
     serve(listener, app).await.unwrap();
 }
@@ -184,11 +178,4 @@ fn get_env() -> Result<EnvConfig, EnvConfigError> {
         postgres_database_name: postgres_database_name,
         cookiekey: cookiekey,
     })
-}
-
-async fn index(cookies: Cookies, State(appstate): State<Arc<AppState>>) -> Response {
-    if !check_authorization(&cookies, &appstate.pg_pool).await {
-        return Redirect::to("/auth/login").into_response();
-    }
-    "Hello, world!".into_response()
 }

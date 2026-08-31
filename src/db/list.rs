@@ -55,8 +55,4 @@ impl List {
     pub async fn get_items(&self, pool: &PgPool) -> Result<Vec<Item>, SqlxError> {
         Item::get_items_for_list(pool, self.id).await
     }
-
-    pub async fn get_lists_for_user(pool: &PgPool, user_id: i32) -> Result<Vec<List>, SqlxError> {
-        query_as!(List, "", user_id)
-    }
 }

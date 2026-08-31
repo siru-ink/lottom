@@ -17,7 +17,7 @@ pub struct AuthenticatedUser {
 #[derive(Debug)]
 pub enum AuthenticationError {
     MissingSessionIDCookie,
-    ExtractingCookiesFailed,
+    ExtractingCookieJarFailed,
     AppStateRetrievalFailed,
     ReferencedSessionNotInDB,
     ReferencedUserNotInDB,
@@ -41,17 +41,16 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let cookie_jar = match Cookies::from_request_parts(parts, state).await {
             Ok(val) => val,
-            Err(_) => return Err(AuthenticationError::ExtractingCookiesFailed),
+            Err(_) => return Err(AuthenticationError::ExtractingCookieJarFailed),
         };
 
         let session_id_cookie = match crate::cookies::CookieKey::SessionID.get(cookie_jar) {
             Ok(cookie) => cookie,
-            Err(_) => return Err(AuthenticationError::ExtractingCookiesFailed),
+            Err(_) => return Err(AuthenticationError::MissingSessionIDCookie),
         };
 
         let session_id = match session_id_cookie {
             CookieValue::SessionID(id) => id,
-            // _ => return Err(AuthenticationError::ExtractingCookiesFailed),  // should never occur
         };
 
         let State(appstate): State<Arc<AppState>> =

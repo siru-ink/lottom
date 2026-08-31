@@ -1,6 +1,4 @@
-use axum::extract::Request;
-use axum::middleware::{Next, from_fn};
-use axum::response::Response;
+use axum::middleware::from_fn;
 use axum::serve;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 use sqlx::postgres::{PgPool, PgPoolOptions};
@@ -17,6 +15,7 @@ use tower_cookies::{CookieManagerLayer, Key};
 mod auth;
 mod cookies;
 mod db;
+mod logging;
 mod routing;
 
 struct AppState {
@@ -83,7 +82,7 @@ async fn main() -> () {
     let app = routing::get_routes()
         .layer(
             ServiceBuilder::new()
-                .layer(from_fn(logger))
+                .layer(from_fn(logging::logger))
                 .layer(CookieManagerLayer::new()),
         )
         .with_state(appstate);
@@ -91,11 +90,6 @@ async fn main() -> () {
     let listener = TcpListener::bind("0.0.0.0:8150").await.unwrap();
 
     serve(listener, app).await.unwrap();
-}
-
-async fn logger(request: Request, next: Next) -> Response {
-    println!("Serving {}", request.uri().to_string());
-    next.run(request).await
 }
 
 struct EnvConfig {

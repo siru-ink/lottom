@@ -19,6 +19,10 @@ impl User {
         self.id
     }
 
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     pub fn check_password(&self, comparison_password: &String) -> CheckPasswordResult {
         if &self.password == comparison_password {
             CheckPasswordResult::PasswordCorrect

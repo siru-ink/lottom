@@ -91,8 +91,8 @@ async fn get_logout(State(appstate): State<Arc<AppState>>, cookies: Cookies) -> 
     }
 }
 
-async fn index(_auth_user: crate::auth::AuthenticatedUser) -> Response {
-    "Hello, world!".into_response()
+async fn index(auth_user: crate::auth::AuthenticatedUser) -> Response {
+    format!("Welcome to Lottom, {}!", auth_user.get().name()).into_response()
 }
 
 pub fn get_routes() -> Router<Arc<AppState>> {

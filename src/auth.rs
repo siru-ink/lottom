@@ -14,6 +14,12 @@ pub struct AuthenticatedUser {
     user: User,
 }
 
+impl AuthenticatedUser {
+    pub fn get(&self) -> &User {
+        &self.user
+    }
+}
+
 #[derive(Debug)]
 pub enum AuthenticationError {
     MissingSessionIDCookie,

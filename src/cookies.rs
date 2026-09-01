@@ -6,6 +6,38 @@ use tower_cookies::{
 #[derive(Debug)]
 pub enum CookieValue {
     SessionID(i32),
+    FlashMessage(String),
+}
+
+impl CookieValue {
+    fn name(&self) -> String {
+        match self {
+            Self::SessionID(_) => "session_id".to_string(),
+            Self::FlashMessage(_) => "flash_message".to_string(),
+        }
+    }
+
+    fn to_cookie(self) -> Cookie<'static> {
+        let name = self.name();
+        match self {
+            CookieValue::SessionID(val) => Cookie::build((name, val.to_string()))
+                .domain("grocery.siru.ink")
+                .path("/")
+                .http_only(true)
+                .max_age(Duration::days(7))
+                .secure(true)
+                .same_site(SameSite::Strict)
+                .build(),
+            CookieValue::FlashMessage(mess) => Cookie::build((name, mess))
+                .domain("grocery.siru.ink")
+                .path("/")
+                .http_only(true)
+                .max_age(Duration::days(7))
+                .secure(true)
+                .same_site(SameSite::Strict)
+                .build(),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -58,16 +90,7 @@ fn modify_cookie(
 
     let encrypted_cookie_jar = cookie_jar.private(cookie_encryption_key);
 
-    let cookie = match cookie_type {
-        CookieValue::SessionID(val) => Cookie::build(("session_id", val.to_string()))
-            .domain("grocery.siru.ink")
-            .path("/")
-            .http_only(true)
-            .max_age(Duration::days(7))
-            .secure(true)
-            .same_site(SameSite::Strict)
-            .build(),
-    };
+    let cookie = cookie_type.to_cookie();
 
     match modification {
         CookieModificationKind::Set => encrypted_cookie_jar.add(cookie),
@@ -80,6 +103,7 @@ fn modify_cookie(
 #[derive(Debug)]
 pub enum CookieKey {
     SessionID,
+    FlashMessage,
 }
 
 #[derive(Debug)]
@@ -111,9 +135,10 @@ impl std::fmt::Display for CookieRetrievalError {
 }
 
 impl CookieKey {
-    fn get_cookie_name(&self) -> &str {
+    fn name(&self) -> &str {
         match self {
             Self::SessionID => "session_id",
+            Self::FlashMessage => "flash_message",
         }
     }
 
@@ -125,7 +150,7 @@ impl CookieKey {
 
         let encrypted_cookie_jar = cookie_jar.private(cookie_jar_password);
 
-        let cookie = match encrypted_cookie_jar.get(self.get_cookie_name()) {
+        let cookie = match encrypted_cookie_jar.get(self.name()) {
             Some(cookie) => cookie,
             None => return Err(CookieRetrievalError::CookieNotInJar),
         };
@@ -138,6 +163,10 @@ impl CookieKey {
                 };
 
                 CookieValue::SessionID(session_id)
+            }
+            Self::FlashMessage => {
+                let message = cookie.value().to_string();
+                CookieValue::FlashMessage(message)
             }
         };
 

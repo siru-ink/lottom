@@ -27,6 +27,7 @@ pub enum AuthenticationError {
     AppStateRetrievalFailed,
     ReferencedSessionNotInDB,
     ReferencedUserNotInDB,
+    HowDidThisHappen,
 }
 
 impl IntoResponse for AuthenticationError {
@@ -57,6 +58,7 @@ where
 
         let session_id = match session_id_cookie {
             CookieValue::SessionID(id) => id,
+            _ => return Err(AuthenticationError::HowDidThisHappen),
         };
 
         let State(appstate): State<Arc<AppState>> =

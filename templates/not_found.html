@@ -1,0 +1,10 @@
+{% extends '_base.html' %}
+
+{% block content %}
+<h2>File Not Found Error (404)</h2>
+<p>The requested resource could not be found.</p>
+{% if flash %}
+<h3>Specifically:</h3>
+<p>{{ flash }}</p>
+{% endif %}
+{% endblock content %}

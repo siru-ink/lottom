@@ -3,7 +3,7 @@
         --background-color: white;
         --text-color: black;
         --text-color-offset: grey;
-        --text-accent-color: blue;
+        --text-accent-color: #2C7761;
     }
 
     *, *::before, *::after {
@@ -59,6 +59,19 @@
                 left: 2px;
                 box-shadow: none;
             }
+        }
+    }
+
+    .error_box {
+        display: block;
+        border: 1px solid var(--text-accent-color);
+        color: var(--text-accent-color);
+        box-shadow: 2px 2px var(--text-accent-color);
+        padding: 0.4em 0.7em;
+        margin-bottom: 1em;
+
+        p {
+            margin: 0
         }
     }
 </style>

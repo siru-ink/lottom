@@ -1,4 +1,4 @@
-use crate::cookies::{CookieKey, CookieRetrievalError};
+use crate::cookies::{self, CookieKey, CookieRetrievalError, CookieValue, set_cookie};
 use axum::{
     extract::{FromRequestParts, OptionalFromRequestParts},
     http::{StatusCode, request::Parts},
@@ -7,12 +7,23 @@ use axum::{
 use tower_cookies::Cookies;
 
 #[derive(Debug)]
-struct FlashMessage {
-    message: String,
+pub struct FlashMessage {
+    pub message: String,
+}
+
+impl FlashMessage {
+    pub fn new(message: String) -> FlashMessage {
+        FlashMessage { message: message }
+    }
+
+    pub fn set(self, cookie_jar: Cookies) {
+        let cookie_value = CookieValue::FlashMessage(self.message);
+        let _ = set_cookie(cookie_value, cookie_jar);
+    }
 }
 
 #[derive(Debug)]
-enum FlashMessageError {
+pub enum FlashMessageError {
     CookieRetrievalError,
 }
 

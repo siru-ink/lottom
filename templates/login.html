@@ -3,6 +3,11 @@
 {% block title %}Login | {% endblock title %}
 
 {% block content %}
+{% if flash_message %}
+<div class="error_box">
+    <p>{{ flash_message }}</p>
+</div>
+{% endif %}
 <form action="/auth/login" method="post" >
     <label>User ID:</label>
     <input type="text" id="user_id" name="user_id" placeholder="Enter your user ID" required>

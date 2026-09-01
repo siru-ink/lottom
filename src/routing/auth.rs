@@ -1,11 +1,11 @@
 use crate::AppState;
+use crate::flash::FlashMessage;
 use crate::routing::html_error;
-use axum::extract::{Form, Query};
+use axum::extract::Query;
 use axum::{
     extract::State,
     response::{Html, IntoResponse, Redirect, Response},
 };
-use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tera::Context;
@@ -14,6 +14,7 @@ use tower_cookies::Cookies;
 pub async fn get_login(
     State(appstate): State<Arc<AppState>>,
     Query(params): Query<HashMap<String, String>>,
+    message: Option<FlashMessage>,
 ) -> Response {
     let mut context = Context::new();
 
@@ -21,6 +22,10 @@ pub async fn get_login(
     let forward_to = params.get("forward_to").unwrap_or(&default_forward_path);
 
     context.insert("forward_to", forward_to);
+
+    if let Some(text) = message {
+        context.insert("flash_message", &text.message);
+    }
 
     match appstate.tera.render("login.html", &context) {
         Ok(val) => Html(val).into_response(),
@@ -31,6 +36,11 @@ pub async fn get_login(
             );
         }
     }
+}
+
+pub async fn get_flash(cookie_jar: Cookies) -> Response {
+    FlashMessage::new("Testing, 1 2 3, Testing".to_string()).set(cookie_jar);
+    Redirect::to("/auth/login").into_response()
 }
 
 // #[derive(Deserialize)]

@@ -1,4 +1,4 @@
-use crate::cookies::{self, CookieKey, CookieRetrievalError, CookieValue, set_cookie};
+use crate::cookies::{CookieKey, CookieRetrievalError, CookieValue, set_cookie};
 use axum::{
     extract::{FromRequestParts, OptionalFromRequestParts},
     http::{StatusCode, request::Parts},

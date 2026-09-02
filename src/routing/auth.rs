@@ -1,4 +1,5 @@
 use crate::AppState;
+use crate::extractor::auth::AuthenticatedUser;
 use crate::extractor::flash::Flash;
 use crate::routing::html_error;
 use axum::extract::Query;
@@ -41,6 +42,10 @@ pub async fn get_login(
 pub async fn set_flash(flash: Flash) -> Response {
     flash.set("Testing, 1 2 3 , testing");
     Redirect::to("/auth/login").into_response()
+}
+
+pub async fn test_auth(_user: AuthenticatedUser) -> Response {
+    "You are now logged in.".into_response()
 }
 
 // #[derive(Deserialize)]

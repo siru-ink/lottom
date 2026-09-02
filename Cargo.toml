@@ -13,3 +13,4 @@ tera = { version = "2.1.1", features = ["fast", "glob_fs"] }
 tokio = { version = "1.53.1", features = ["full"] }
 tower = "0.5.3"
 tower-cookies = { version="0.11.0", features = ["private"] }
+urlencoding = "2.1.3"

@@ -1,7 +1,6 @@
 use crate::db::session::Session;
 use crate::db::user::User;
 use crate::{AppState, cookies::CookieValue};
-use axum::http::uri;
 use axum::{
     extract::{FromRequestParts, State},
     http::request::Parts,
@@ -13,7 +12,7 @@ use urlencoding;
 
 #[derive(Debug)]
 pub struct AuthenticatedUser {
-    user: User,
+    _user: User,
 }
 
 type RedirectToPath = String;
@@ -97,6 +96,6 @@ where
             None => return Err(AuthenticatedUserExtractorError::ReferencedUserNotInDB(uri)),
         };
 
-        Ok(AuthenticatedUser { user: user })
+        Ok(AuthenticatedUser { _user: user })
     }
 }

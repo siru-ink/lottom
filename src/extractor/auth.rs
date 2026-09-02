@@ -14,14 +14,8 @@ pub struct AuthenticatedUser {
     user: User,
 }
 
-impl AuthenticatedUser {
-    pub fn get(&self) -> &User {
-        &self.user
-    }
-}
-
 #[derive(Debug)]
-pub enum AuthenticationError {
+pub enum AuthenticatedUserExtractorError {
     MissingSessionIDCookie,
     ExtractingCookieJarFailed,
     AppStateRetrievalFailed,
@@ -30,7 +24,7 @@ pub enum AuthenticationError {
     HowDidThisHappen,
 }
 
-impl IntoResponse for AuthenticationError {
+impl IntoResponse for AuthenticatedUserExtractorError {
     fn into_response(self) -> Response {
         match self {
             _ => Redirect::to("/auth/login").into_response(),
@@ -43,38 +37,38 @@ where
     S: Send + Sync,
     State<Arc<AppState>>: FromRequestParts<S>,
 {
-    type Rejection = AuthenticationError;
+    type Rejection = AuthenticatedUserExtractorError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let cookie_jar = match Cookies::from_request_parts(parts, state).await {
             Ok(val) => val,
-            Err(_) => return Err(AuthenticationError::ExtractingCookieJarFailed),
+            Err(_) => return Err(AuthenticatedUserExtractorError::ExtractingCookieJarFailed),
         };
 
         let session_id_cookie = match crate::cookies::CookieKey::SessionID.get(cookie_jar) {
             Ok(cookie) => cookie,
-            Err(_) => return Err(AuthenticationError::MissingSessionIDCookie),
+            Err(_) => return Err(AuthenticatedUserExtractorError::MissingSessionIDCookie),
         };
 
         let session_id = match session_id_cookie {
             CookieValue::SessionID(id) => id,
-            _ => return Err(AuthenticationError::HowDidThisHappen),
+            _ => return Err(AuthenticatedUserExtractorError::HowDidThisHappen),
         };
 
         let State(appstate): State<Arc<AppState>> =
             match State::from_request_parts(parts, state).await {
                 Ok(val) => val,
-                Err(_) => return Err(AuthenticationError::AppStateRetrievalFailed),
+                Err(_) => return Err(AuthenticatedUserExtractorError::AppStateRetrievalFailed),
             };
 
         let session = match Session::read(&appstate.pg_pool, session_id).await {
             Some(session) => session,
-            None => return Err(AuthenticationError::ReferencedSessionNotInDB),
+            None => return Err(AuthenticatedUserExtractorError::ReferencedSessionNotInDB),
         };
 
         let user = match session.get_user(&appstate.pg_pool).await {
             Some(user) => user,
-            None => return Err(AuthenticationError::ReferencedUserNotInDB),
+            None => return Err(AuthenticatedUserExtractorError::ReferencedUserNotInDB),
         };
 
         Ok(AuthenticatedUser { user: user })

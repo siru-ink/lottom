@@ -6,7 +6,6 @@ use tokio::{main, net::TcpListener};
 use tower::ServiceBuilder;
 use tower_cookies::{CookieManagerLayer, Key};
 
-mod auth;
 mod cookies;
 mod db;
 mod env;

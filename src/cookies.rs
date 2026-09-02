@@ -166,6 +166,7 @@ impl CookieKey {
             }
             Self::FlashMessage => {
                 let message = cookie.value().to_string();
+                let _ = remove_cookie(CookieValue::FlashMessage("".to_string()), cookie_jar);
                 CookieValue::FlashMessage(message)
             }
         };

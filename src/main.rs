@@ -10,6 +10,7 @@ mod auth;
 mod cookies;
 mod db;
 mod env;
+mod extractor;
 mod flash;
 mod logging;
 mod routing;

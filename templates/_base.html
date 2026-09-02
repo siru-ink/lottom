@@ -12,6 +12,11 @@
     </head>
     <body>
         <div class="container">
+            {% if flash_message %}
+            <div class="flash_box">
+                <p>{{ flash_message }}</p>
+            </div>
+            {% endif %}
             {% block content %}{% endblock content %}
         </div>
     </body>

@@ -8,7 +8,7 @@ mod html_error;
 pub fn get_routes() -> Router<Arc<AppState>> {
     let auth_router = Router::new()
         .route("/login", get(auth::get_login))
-        .route("/flash", get(auth::get_flash));
+        .route("/flash", get(auth::set_flash));
 
     Router::new().nest("/auth", auth_router)
 }

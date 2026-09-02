@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::flash::FlashMessage;
+use crate::extractor::flash::Flash;
 use crate::routing::html_error;
 use axum::extract::Query;
 use axum::{
@@ -14,7 +14,7 @@ use tower_cookies::Cookies;
 pub async fn get_login(
     State(appstate): State<Arc<AppState>>,
     Query(params): Query<HashMap<String, String>>,
-    message: Option<FlashMessage>,
+    flash: Flash,
 ) -> Response {
     let mut context = Context::new();
 
@@ -23,8 +23,8 @@ pub async fn get_login(
 
     context.insert("forward_to", forward_to);
 
-    if let Some(text) = message {
-        context.insert("flash_message", &text.message);
+    if let Some(text) = flash.get() {
+        context.insert("flash_message", &text);
     }
 
     match appstate.tera.render("login.html", &context) {
@@ -38,8 +38,8 @@ pub async fn get_login(
     }
 }
 
-pub async fn get_flash(cookie_jar: Cookies) -> Response {
-    FlashMessage::new("Testing, 1 2 3, Testing".to_string()).set(cookie_jar);
+pub async fn set_flash(flash: Flash) -> Response {
+    flash.set("Testing, 1 2 3 , testing");
     Redirect::to("/auth/login").into_response()
 }
 

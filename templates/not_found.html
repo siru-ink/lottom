@@ -3,8 +3,8 @@
 {% block content %}
 <h2>File Not Found Error (404)</h2>
 <p>The requested resource could not be found.</p>
-{% if flash %}
+{% if explanation %}
 <h3>Specifically:</h3>
-<p>{{ flash }}</p>
+<p>{{ explanation }}</p>
 {% endif %}
 {% endblock content %}

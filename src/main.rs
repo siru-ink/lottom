@@ -12,6 +12,7 @@ mod env;
 mod extractor;
 mod logging;
 mod routing;
+mod template;
 
 struct AppState {
     pg_pool: PgPool,

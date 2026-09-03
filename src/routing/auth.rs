@@ -4,7 +4,6 @@ use crate::db::{
     session::Session,
     user::{CheckPasswordResult, User},
 };
-use crate::extractor::auth::AuthenticatedUser;
 use crate::extractor::flash::Flash;
 use crate::routing::html_error;
 use axum::extract::Query;

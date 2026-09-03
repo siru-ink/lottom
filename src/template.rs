@@ -74,3 +74,44 @@ impl<'a> LogoutPage<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct LoginPage<'a> {
+    forward_to: String,
+    flash: Option<String>,
+    templates: &'a Tera,
+}
+
+impl<'a> LoginPage<'a> {
+    pub fn new(templates: &'a Tera, forward_to: Option<&String>, flash: Option<String>) -> Self {
+        let forward_to = forward_to.cloned().unwrap_or_else(|| "/".to_string());
+        // let flash = match flash {
+        //     Some(val) => Some(val.to_string()),
+        //     None => None,
+        // };
+
+        LoginPage {
+            forward_to: forward_to,
+            flash: flash,
+            templates: templates,
+        }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+
+        context.insert("forward_to", &self.forward_to);
+
+        if let Some(flash) = self.flash {
+            context.insert("flash", &flash);
+        }
+
+        match self.templates.render("login.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => {
+                NotFoundPage::new(self.templates, Some("login.html template failed to render"))
+                    .render()
+            }
+        }
+    }
+}

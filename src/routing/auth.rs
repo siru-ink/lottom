@@ -45,36 +45,26 @@ pub async fn get_login(
     }
 }
 
-pub async fn set_flash(flash: Flash) -> Response {
-    flash.set("Testing, 1 2 3 , testing");
-    Redirect::to("/auth/login").into_response()
-}
-
-pub async fn test_auth(_user: AuthenticatedUser) -> Response {
-    "You are now logged in.".into_response()
-}
-
 #[derive(Deserialize)]
-struct LoginForm {
+pub struct LoginForm {
     user_id: String,
     password: String,
     forward_to: String,
 }
 
-async fn post_login(
+pub async fn post_login(
     State(appstate): State<Arc<AppState>>,
     cookies: Cookies,
-    Form(login_form): Form<LoginForm>,
     flash: Flash,
+    Form(login_form): Form<LoginForm>,
 ) -> Response {
-    let redirect_uri = urlencoding::encode(&login_form.forward_to).to_owned();
+    let forward_to_urlencoded = urlencoding::encode(&login_form.forward_to).to_owned();
 
-    // Check whether the provided user id is in fact a number
     let user_id: i32 = match login_form.user_id.parse() {
         Ok(number) => number,
         Err(_) => {
             flash.set("Please enter a numerical user id to log in.");
-            return Redirect::to(&format!("/auth/login?forward_to={}", redirect_uri))
+            return Redirect::to(&format!("/auth/login?forward_to={}", forward_to_urlencoded))
                 .into_response();
         }
     };
@@ -83,7 +73,7 @@ async fn post_login(
         Some(user) => user,
         None => {
             flash.set("The provided user id does not exist.");
-            return Redirect::to(&format!("/auth/login?forward_to={}", redirect_uri))
+            return Redirect::to(&format!("/auth/login?forward_to={}", forward_to_urlencoded))
                 .into_response();
         }
     };
@@ -92,7 +82,7 @@ async fn post_login(
         CheckPasswordResult::PasswordCorrect => (),
         CheckPasswordResult::PasswordWrong => {
             flash.set("The provided password was not correct.");
-            return Redirect::to(&format!("/auth/login?forward_to={}", redirect_uri))
+            return Redirect::to(&format!("/auth/login?forward_to={}", forward_to_urlencoded))
                 .into_response();
         }
     };
@@ -105,17 +95,17 @@ async fn post_login(
                 "Logging in failed because no session id could be created. \
                 Please try again or contact the system administrator.",
             );
-            return Redirect::to(&format!("/auth/login?forward_to={}", redirect_uri))
+            return Redirect::to(&format!("/auth/login?forward_to={}", forward_to_urlencoded))
                 .into_response();
         }
     };
 
     // Store the session id as a private cookie
     match set_cookie(new_session.as_cookie_value(), cookies) {
-        Ok(_) => return Redirect::to(&redirect_uri).into_response(),
+        Ok(_) => return Redirect::to(&login_form.forward_to).into_response(),
         Err(_) => {
             flash.set("Please allow cookies for this domain/website to be able to log in.");
-            return Redirect::to(&format!("/auth/login?forward_to={}", redirect_uri))
+            return Redirect::to(&format!("/auth/login?forward_to={}", forward_to_urlencoded))
                 .into_response();
         }
     }

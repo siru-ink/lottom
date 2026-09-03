@@ -148,14 +148,14 @@ impl<'a> InternalServerErrorPage<'a> {
 }
 
 #[derive(Debug)]
-pub struct List<'a> {
+pub struct ListPage<'a> {
     items: Vec<Item>,
     templates: &'a Tera,
 }
 
-impl<'a> List<'a> {
+impl<'a> ListPage<'a> {
     pub fn new(templates: &'a Tera, items: Vec<Item>) -> Self {
-        List { items, templates }
+        ListPage { items, templates }
     }
 
     pub fn render(self) -> Response {

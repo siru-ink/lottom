@@ -2,7 +2,7 @@ use crate::{
     AppState,
     db::list::List,
     extractor::auth::AuthenticatedUser,
-    template::{self, InternalServerErrorPage, NotFoundPage},
+    template::{InternalServerErrorPage, ListPage, NotFoundPage},
 };
 use axum::{
     extract::{Query, State},
@@ -36,5 +36,5 @@ pub async fn get_list(
         Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    template::List::new(&state.tera, list_items).render()
+    ListPage::new(&state.tera, list_items).render()
 }

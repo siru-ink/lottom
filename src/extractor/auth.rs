@@ -12,7 +12,13 @@ use urlencoding;
 
 #[derive(Debug)]
 pub struct AuthenticatedUser {
-    _user: User,
+    user: User,
+}
+
+impl AuthenticatedUser {
+    pub fn inner(self) -> User {
+        self.user
+    }
 }
 
 type RedirectToPath = String;
@@ -96,6 +102,6 @@ where
             None => return Err(AuthenticatedUserExtractorError::ReferencedUserNotInDB(uri)),
         };
 
-        Ok(AuthenticatedUser { _user: user })
+        Ok(AuthenticatedUser { user: user })
     }
 }

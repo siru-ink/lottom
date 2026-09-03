@@ -31,6 +31,10 @@ impl User {
         }
     }
 
+    pub fn default_list(&self) -> i32 {
+        self.default_list_id
+    }
+
     pub async fn create(pool: &PgPool, new_name: &str, new_password: &str) -> Option<i32> {
         let new_list = match List::create(pool, "default").await {
             Some(val) => val,

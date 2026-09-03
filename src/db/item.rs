@@ -1,6 +1,7 @@
+use serde::Serialize;
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Item {
     id: i32,
     list_id: i32,

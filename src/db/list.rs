@@ -12,6 +12,10 @@ impl List {
         self.id
     }
 
+    pub async fn get_items(&self, pool: &PgPool) -> Result<Vec<Item>, SqlxError> {
+        Item::get_items_for_list(pool, self.id).await
+    }
+
     pub async fn create(pool: &PgPool, new_name: &str) -> Option<List> {
         query_as!(
             List,
@@ -50,9 +54,5 @@ impl List {
             Ok(_) => Ok(()),
             Err(e) => return Err(e),
         }
-    }
-
-    pub async fn get_items(&self, pool: &PgPool) -> Result<Vec<Item>, SqlxError> {
-        Item::get_items_for_list(pool, self.id).await
     }
 }

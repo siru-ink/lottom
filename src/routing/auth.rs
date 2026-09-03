@@ -5,16 +5,15 @@ use crate::db::{
     user::{CheckPasswordResult, User},
 };
 use crate::extractor::flash::Flash;
-use crate::template::{LogoutPage, NotFoundPage};
+use crate::template::{LoginPage, LogoutPage};
 use axum::extract::Query;
 use axum::{
     extract::{Form, State},
-    response::{Html, IntoResponse, Redirect, Response},
+    response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tera::Context;
 use tower_cookies::Cookies;
 
 pub async fn get_login(
@@ -22,24 +21,9 @@ pub async fn get_login(
     Query(params): Query<HashMap<String, String>>,
     flash: Flash,
 ) -> Response {
-    let mut context = Context::new();
-
-    let default_forward_path = "/".to_string();
-    let forward_to = params.get("forward_to").unwrap_or(&default_forward_path);
-
-    context.insert("forward_to", forward_to);
-
-    if let Some(text) = flash.get() {
-        context.insert("flash_message", &text);
-    }
-
-    match appstate.tera.render("login.html", &context) {
-        Ok(val) => Html(val).into_response(),
-        Err(e) => {
-            return NotFoundPage::new(&appstate.tera, Some("login.html template failed to render"))
-                .render();
-        }
-    }
+    let forward_to = params.get("forward_to");
+    let flash_message = flash.get();
+    LoginPage::new(&appstate.tera, forward_to, flash_message).render()
 }
 
 #[derive(Deserialize)]

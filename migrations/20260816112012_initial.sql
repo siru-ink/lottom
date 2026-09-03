@@ -47,4 +47,4 @@ CREATE TABLE IF NOT EXISTS prefill_items (
 );
 
 -- Create default user list access roles
-INSERT INTO roles (name) VALUES ('owner'), ('editor'), ('viewer');
+INSERT INTO roles (id, name) VALUES (1, 'owner'), (2, 'editor'), (3, 'viewer');

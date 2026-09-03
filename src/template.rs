@@ -115,3 +115,33 @@ impl<'a> LoginPage<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct InternalServerErrorPage<'a> {
+    templates: &'a Tera,
+}
+
+impl<'a> InternalServerErrorPage<'a> {
+    pub fn new(templates: &'a Tera) -> Self {
+        InternalServerErrorPage {
+            templates: templates,
+        }
+    }
+
+    pub fn render(self) -> Response {
+        let context = Context::new();
+        match self
+            .templates
+            .render("internal_server_error.html", &context)
+        {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "internal_server_error.html failed to render",
+                )
+                    .into_response();
+            }
+        }
+    }
+}

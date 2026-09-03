@@ -1,4 +1,4 @@
-use crate::db::item::Item;
+use crate::db::{item::Item, list::List};
 use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
@@ -169,6 +169,33 @@ impl<'a> ListPage<'a> {
                 NotFoundPage::new(self.templates, Some("list.html template failed to render"))
                     .render()
             }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct IndexPage<'a> {
+    username: &'a str,
+    lists: Vec<List>,
+    templates: &'a Tera,
+}
+
+impl<'a> IndexPage<'a> {
+    pub fn new(templates: &'a Tera, username: &'a str, lists: Vec<List>) -> Self {
+        IndexPage {
+            username,
+            lists,
+            templates,
+        }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+        context.insert("username", &self.username);
+        context.insert("lists", &self.lists);
+        match self.templates.render("index.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(self.templates).render(),
         }
     }
 }

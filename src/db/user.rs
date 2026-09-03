@@ -35,6 +35,10 @@ impl User {
         self.default_list_id
     }
 
+    pub async fn lists(&self, pool: &PgPool) -> Result<Vec<List>, SqlxError> {
+        List::get_lists_for_user(pool, self.id).await
+    }
+
     pub async fn create(pool: &PgPool, new_name: &str, new_password: &str) -> Option<i32> {
         let new_list = match List::create(pool, "default").await {
             Some(val) => val,

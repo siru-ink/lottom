@@ -1,3 +1,4 @@
+use crate::db::item::Item;
 use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
@@ -141,6 +142,32 @@ impl<'a> InternalServerErrorPage<'a> {
                     "internal_server_error.html failed to render",
                 )
                     .into_response();
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct List<'a> {
+    items: Vec<Item>,
+    templates: &'a Tera,
+}
+
+impl<'a> List<'a> {
+    pub fn new(templates: &'a Tera, items: Vec<Item>) -> Self {
+        List { items, templates }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+
+        context.insert("items", &self.items);
+
+        match self.templates.render("list.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => {
+                NotFoundPage::new(self.templates, Some("list.html template failed to render"))
+                    .render()
             }
         }
     }

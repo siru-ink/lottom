@@ -1,11 +1,11 @@
 use crate::AppState;
-use crate::cookies::set_cookie;
+use crate::cookies::{CookieValue, remove_cookie, set_cookie};
 use crate::db::{
     session::Session,
     user::{CheckPasswordResult, User},
 };
 use crate::extractor::flash::Flash;
-use crate::routing::html_error;
+use crate::template::{LogoutPage, NotFoundPage};
 use axum::extract::Query;
 use axum::{
     extract::{Form, State},
@@ -36,10 +36,8 @@ pub async fn get_login(
     match appstate.tera.render("login.html", &context) {
         Ok(val) => Html(val).into_response(),
         Err(e) => {
-            return html_error::not_found(
-                appstate,
-                &format!("Login template could not be found: {}", e),
-            );
+            return NotFoundPage::new(&appstate.tera, Some("login.html template failed to render"))
+                .render();
         }
     }
 }
@@ -108,4 +106,9 @@ pub async fn post_login(
                 .into_response();
         }
     }
+}
+
+pub async fn get_logout(State(state): State<Arc<AppState>>, cookie_jar: Cookies) -> Response {
+    let _ = remove_cookie(CookieValue::SessionID(0), cookie_jar);
+    LogoutPage::new(&state.tera, "You have been logged out. Have a nice day.").render()
 }

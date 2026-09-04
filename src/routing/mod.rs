@@ -7,6 +7,7 @@ use axum::{Router, extract::State, response::Response, routing::get};
 use std::sync::Arc;
 
 mod auth;
+mod item;
 mod list;
 
 pub fn get_routes() -> Router<Arc<AppState>> {
@@ -14,6 +15,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         .route("/auth/login", get(auth::get_login).post(auth::post_login))
         .route("/auth/logout", get(auth::get_logout))
         .route("/list", get(list::get_list))
+        .route("/item", get(item::get_item))
         .route("/", get(index))
 }
 

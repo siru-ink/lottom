@@ -1,0 +1,20 @@
+{% extends '_base.html' %}
+
+{% block title %}List | {% endblock title %}
+
+{% block content %}
+<form action="/item/modify" method="POST">
+    <input type="hidden" name="id" value="{{ item.id }}" />
+    <input type="hidden" name="list_id" value="{{ item.list_id }}" />
+    <label for="en_name">English Name:</label>
+    <input type="text" name="en_name" value="{{ item.en_name }}" />
+    <label for="zh_name">Chinese Name:</label>
+    <input type="text" name="zh_name" value="{{ item.zh_name }}" />
+    <label for="de_name">German Name:</label>
+    <input type="text" name="de_name" value="{{ item.de_name }}" />
+    <input type="hidden" name="img_path" value="{{ item.img_path }}" />
+    <label for="estimated_euro_price">Estimated Euro Price:</label>
+    <input type="number" name="estimated_euro_price" value="{{ item.estimated_euro_price }}" />
+    <button type="submit">Save Modifications</button>
+</form>
+{% endblock content %}

@@ -199,3 +199,24 @@ impl<'a> IndexPage<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct ItemPage<'a> {
+    item: Item,
+    templates: &'a Tera,
+}
+
+impl<'a> ItemPage<'a> {
+    pub fn new(templates: &'a Tera, item: Item) -> Self {
+        ItemPage { item, templates }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+        context.insert("item", &self.item);
+        match self.templates.render("item.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(self.templates).render(),
+        }
+    }
+}

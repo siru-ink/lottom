@@ -1,7 +1,8 @@
 use crate::{
     AppState,
-    db::item::Item,
-    template::{InternalServerErrorPage, ItemPage, NotFoundPage},
+    db::{item::Item, prefill_item::PrefillItem},
+    routing::list,
+    template::{AddItemPage, InternalServerErrorPage, ItemPage, NotFoundPage},
 };
 use axum::{
     Form,
@@ -83,4 +84,26 @@ pub async fn post_modify(
         Some(item) => Redirect::to(&format!("/item?item_id={}", item.id())).into_response(),
         None => InternalServerErrorPage::new(&state.tera).render(),
     }
+}
+
+#[axum::debug_handler]
+pub async fn get_add(
+    State(state): State<Arc<AppState>>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Response {
+    let prefill_items = match PrefillItem::get_all(&state.pg_pool).await {
+        Ok(items) => items,
+        Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
+    };
+
+    println!("check1");
+
+    let list_id = match params.get("list_id") {
+        Some(id) => id,
+        None => return InternalServerErrorPage::new(&state.tera).render(),
+    };
+
+    println!("check2");
+
+    AddItemPage::new(&state.tera, prefill_items, list_id.to_owned()).render()
 }

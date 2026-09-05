@@ -1,0 +1,37 @@
+{% extends '_base.html' %}
+
+{% block title %}Add Item | {% endblock title %}
+
+{% block content %}
+<form action="/item/add" method="POST">
+    <input type="text" id="searchInput" placeholder="Search..." />
+    <br />
+    {% for item in prefill_items %}
+    <div>
+        <input type="checkbox" id="checkbox-{{ item.id }}" name="ids" value="{{ item.id }}" />
+        <label for="checkbox-{{ item.id }}">{{ item.en_name }}</label>
+    </div>
+    {% endfor %}
+    <br />
+    <button type="submit">Add to List</button>
+</form>
+
+<script>
+  const searchInput = document.getElementById('searchInput');
+  // Select all div containers that hold the checkboxes
+  const itemDivs = document.querySelectorAll('form div');
+
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+
+    itemDivs.forEach(div => {
+      // Get the label text within each div
+      const label = div.querySelector('label');
+      const text = label ? label.textContent.toLowerCase() : '';
+
+      // Show/hide the entire div based on match
+      div.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock content %}

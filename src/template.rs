@@ -1,9 +1,9 @@
-use crate::db::{item::Item, list::List};
+use crate::db::{item::Item, list::List, prefill_item::PrefillItem};
 use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
-use tera::{Context, Tera};
+use tera::{Context, Tera, context};
 
 #[derive(Debug)]
 pub struct NotFoundPage<'a> {
@@ -221,6 +221,37 @@ impl<'a> ItemPage<'a> {
         let mut context = Context::new();
         context.insert("item", &self.item);
         match self.templates.render("item.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(self.templates).render(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct AddItemPage<'a> {
+    prefill_items: Vec<PrefillItem>,
+    list_id: String,
+    templates: &'a Tera,
+}
+
+impl<'a> AddItemPage<'a> {
+    pub fn new(templates: &'a Tera, prefill_items: Vec<PrefillItem>, list_id: String) -> Self {
+        AddItemPage {
+            prefill_items,
+            list_id,
+            templates,
+        }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+
+        context.insert("list_id", &self.list_id);
+        context.insert("prefill_items", &self.prefill_items);
+
+        println!("check3");
+
+        match self.templates.render("add_item.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(self.templates).render(),
         }

@@ -7,6 +7,8 @@ use std::path::Path;
 
 pub mod item;
 pub mod list;
+pub mod list_user_map;
+mod roles;
 pub mod session;
 pub mod user;
 

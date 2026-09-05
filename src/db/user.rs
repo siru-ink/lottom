@@ -1,4 +1,4 @@
-use crate::db::list::List;
+use crate::db::{list::List, list_user_map::ListUserMapping, roles::Roles};
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
 #[derive(Debug)]
@@ -55,6 +55,11 @@ impl User {
         .await
         .ok()?
         .id;
+
+        // Also create the lists <-> users mapping
+        ListUserMapping::create(pool, new_user_id, new_list.get_id(), Roles::owner.id()).await;
+
+        // TODO add rollback logic in case either of the inserts fails to leave db in better state
 
         Some(new_user_id)
     }

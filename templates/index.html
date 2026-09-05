@@ -5,9 +5,9 @@
 {% block content %}
 <h2>Welcome back, {{ username }}!</h2>
 <p>Would you like to look at one of your lists?</p>
-<ul>
-    {% for list in lists %}
-    <li><a href="/list?list_id={{ list.id }}">{{ list.name }}</a></li>
-    {% endfor %}
-</ul>
+{% for list in lists %}
+<div class="link_box">
+    <a href="/list?list_id={{ list.id }}">{{ list.name }}</a>
+</div>
+{% endfor %}
 {% endblock content %}

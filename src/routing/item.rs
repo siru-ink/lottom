@@ -1,12 +1,14 @@
 use crate::{
     AppState,
     db::item::Item,
-    template::{ItemPage, NotFoundPage},
+    template::{InternalServerErrorPage, ItemPage, NotFoundPage},
 };
 use axum::{
+    Form,
     extract::{Query, State},
-    response::Response,
+    response::{IntoResponse, Redirect, Response},
 };
+use serde::Deserialize;
 use std::{collections::HashMap, sync::Arc};
 
 pub async fn get_item(
@@ -44,4 +46,41 @@ pub async fn get_item(
     };
 
     ItemPage::new(&state.tera, item).render()
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ModifyItemForm {
+    id: i32,
+    list_id: i32,
+    en_name: String,
+    zh_name: String,
+    de_name: String,
+    img_path: String,
+    estimated_euro_price: i32,
+}
+
+#[axum::debug_handler]
+pub async fn post_modify_item(
+    State(state): State<Arc<AppState>>,
+    Form(form): Form<ModifyItemForm>,
+) -> Response {
+    let img_path_parsed = if form.img_path.is_empty() {
+        None
+    } else {
+        Some(form.img_path)
+    };
+    let changed_item = Item::new(
+        form.id,
+        form.list_id,
+        form.en_name,
+        form.zh_name,
+        form.de_name,
+        img_path_parsed,
+        form.estimated_euro_price,
+    );
+
+    match Item::update(&state.pg_pool, &changed_item).await {
+        Some(item) => Redirect::to(&format!("/item?item_id={}", item.id())).into_response(),
+        None => InternalServerErrorPage::new(&state.tera).render(),
+    }
 }

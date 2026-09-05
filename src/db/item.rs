@@ -13,6 +13,30 @@ pub struct Item {
 }
 
 impl Item {
+    pub fn new(
+        id: i32,
+        list_id: i32,
+        en_name: String,
+        zh_name: String,
+        de_name: String,
+        img_path: Option<String>,
+        estimated_euro_price: i32,
+    ) -> Self {
+        Item {
+            id,
+            list_id,
+            en_name,
+            zh_name,
+            de_name,
+            img_path,
+            estimated_euro_price,
+        }
+    }
+
+    pub fn id(self) -> i32 {
+        self.id
+    }
+
     pub async fn create(
         pool: &PgPool,
         new_list_id: i32,

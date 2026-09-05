@@ -3,7 +3,12 @@ use crate::{
     extractor::auth::AuthenticatedUser,
     template::{IndexPage, InternalServerErrorPage},
 };
-use axum::{Router, extract::State, response::Response, routing::get};
+use axum::{
+    Router,
+    extract::State,
+    response::Response,
+    routing::{get, post},
+};
 use std::sync::Arc;
 
 mod auth;
@@ -16,6 +21,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         .route("/auth/logout", get(auth::get_logout))
         .route("/list", get(list::get_list))
         .route("/item", get(item::get_item))
+        .route("/item/modify", post(item::post_modify_item))
         .route("/", get(index))
 }
 

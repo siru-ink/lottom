@@ -3,11 +3,11 @@
 {% block title %}List | {% endblock title %}
 
 {% block content %}
-<form >
+<form action="/list/bought" method="POST">
+    <input type="hidden" name="list_id" value="{{ list_id }}" />
     {% for item in items %}
     <div>
-        <label for="checkbox-{{ item.id }}"></label>
-        <input type="checkbox" name="{{ item.id }}" id="checkbox-{{ item.id }}" />
+        <input type="checkbox" name="item_ids" value="{{ item.id }}" />
         <a href="/item?item_id={{ item.id }}">{{ item.en_name }}</a>
     </div>
     {% endfor %}

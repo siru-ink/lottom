@@ -150,18 +150,24 @@ impl<'a> InternalServerErrorPage<'a> {
 #[derive(Debug)]
 pub struct ListPage<'a> {
     items: Vec<Item>,
+    list_id: i32,
     templates: &'a Tera,
 }
 
 impl<'a> ListPage<'a> {
-    pub fn new(templates: &'a Tera, items: Vec<Item>) -> Self {
-        ListPage { items, templates }
+    pub fn new(templates: &'a Tera, items: Vec<Item>, list_id: i32) -> Self {
+        ListPage {
+            items,
+            list_id,
+            templates,
+        }
     }
 
     pub fn render(self) -> Response {
         let mut context = Context::new();
 
         context.insert("items", &self.items);
+        context.insert("list_id", &self.list_id);
 
         match self.templates.render("list.html", &context) {
             Ok(page) => Html(page).into_response(),

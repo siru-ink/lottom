@@ -5,6 +5,7 @@
 {% block content %}
 <form action="/item/add" method="POST">
     <input type="text" id="searchInput" placeholder="Search..." />
+    <input type="hidden" name="list_id" value="{{ list_id }}" />
     <br />
     {% for item in prefill_items %}
     <div>

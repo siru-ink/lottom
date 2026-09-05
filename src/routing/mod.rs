@@ -26,7 +26,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         )
         .route("/item", get(item::get_display))
         .route("/item/modify", post(item::post_modify))
-        .route("/item/add", get(item::get_add))
+        .route("/item/add", get(item::get_add).post(item::post_add))
         .route("/", get(index))
 }
 

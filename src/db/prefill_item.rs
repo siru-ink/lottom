@@ -16,4 +16,27 @@ impl PrefillItem {
             .fetch_all(pool)
             .await
     }
+
+    pub async fn read(pool: &PgPool, id: i32) -> Option<Self> {
+        query_as!(PrefillItem, "SELECT * FROM prefill_items WHERE id = $1", id)
+            .fetch_optional(pool)
+            .await
+            .ok()?
+    }
+
+    pub fn en_name(&self) -> String {
+        self.en_name.clone()
+    }
+
+    pub fn zh_name(&self) -> String {
+        self.zh_name.clone()
+    }
+
+    pub fn de_name(&self) -> String {
+        self.de_name.clone()
+    }
+
+    pub fn price(&self) -> i32 {
+        self.euro_price
+    }
 }

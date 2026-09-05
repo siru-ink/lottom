@@ -1,6 +1,8 @@
 use serde::Serialize;
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
+use crate::db::prefill_item::PrefillItem;
+
 #[derive(Debug, Serialize)]
 pub struct Item {
     id: i32,
@@ -35,6 +37,23 @@ impl Item {
 
     pub fn id(self) -> i32 {
         self.id
+    }
+
+    pub async fn from_prefill_item(
+        pool: &PgPool,
+        list_id: i32,
+        prefill_item: PrefillItem,
+    ) -> Option<Self> {
+        Self::create(
+            pool,
+            list_id,
+            &prefill_item.en_name(),
+            &prefill_item.zh_name(),
+            &prefill_item.de_name(),
+            &None,
+            prefill_item.price(),
+        )
+        .await
     }
 
     pub async fn create(

@@ -249,8 +249,6 @@ impl<'a> AddItemPage<'a> {
         context.insert("list_id", &self.list_id);
         context.insert("prefill_items", &self.prefill_items);
 
-        println!("check3");
-
         match self.templates.render("add_item.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(self.templates).render(),

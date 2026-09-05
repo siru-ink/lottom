@@ -1,14 +1,13 @@
 use crate::{
     AppState,
-    db::{item::Item, prefill_item::PrefillItem},
-    routing::list,
+    db::{item::Item, list::List, prefill_item::PrefillItem},
     template::{AddItemPage, InternalServerErrorPage, ItemPage, NotFoundPage},
 };
 use axum::{
-    Form,
     extract::{Query, State},
     response::{IntoResponse, Redirect, Response},
 };
+use axum_extra::extract::Form;
 use serde::Deserialize;
 use std::{collections::HashMap, sync::Arc};
 
@@ -96,14 +95,37 @@ pub async fn get_add(
         Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    println!("check1");
-
     let list_id = match params.get("list_id") {
         Some(id) => id,
         None => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    println!("check2");
-
     AddItemPage::new(&state.tera, prefill_items, list_id.to_owned()).render()
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AddItemForm {
+    ids: Vec<i32>,
+    list_id: i32,
+}
+
+#[axum::debug_handler]
+pub async fn post_add(
+    State(state): State<Arc<AppState>>,
+    Form(form): Form<AddItemForm>,
+) -> Response {
+    println!("{:#?}", form);
+
+    let list = match List::read(&state.pg_pool, form.list_id).await {
+        Some(list) => list,
+        None => return InternalServerErrorPage::new(&state.tera).render(),
+    };
+
+    for prefill_id in form.ids {
+        if let Some(prefill_item) = PrefillItem::read(&state.pg_pool, prefill_id).await {
+            let _ = Item::from_prefill_item(&state.pg_pool, list.get_id(), prefill_item).await;
+        }
+    }
+
+    Redirect::to(&format!("/list?list_id={}", list.get_id())).into_response()
 }

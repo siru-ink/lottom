@@ -6,9 +6,9 @@
 
 #[derive(Debug)]
 pub enum Roles {
-    owner,
-    editor,
-    viewer,
+    Owner,
+    Editor,
+    Viewer,
 }
 
 // impl Role {
@@ -23,9 +23,9 @@ pub enum Roles {
 impl Roles {
     pub fn id(self) -> i32 {
         match self {
-            Self::owner => 1,
-            Self::editor => 2,
-            Self::viewer => 3,
+            Self::Owner => 1,
+            Self::Editor => 2,
+            Self::Viewer => 3,
         }
     }
 }

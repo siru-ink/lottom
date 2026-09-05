@@ -57,7 +57,7 @@ impl User {
         .id;
 
         // Also create the lists <-> users mapping
-        ListUserMapping::create(pool, new_user_id, new_list.get_id(), Roles::owner.id()).await;
+        ListUserMapping::create(pool, new_user_id, new_list.get_id(), Roles::Owner.id()).await;
 
         // TODO add rollback logic in case either of the inserts fails to leave db in better state
 

@@ -255,3 +255,22 @@ impl<'a> AddItemPage<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct SignUpPage<'a> {
+    templates: &'a Tera,
+}
+
+impl<'a> SignUpPage<'a> {
+    pub fn new(templates: &'a Tera) -> Self {
+        SignUpPage { templates }
+    }
+
+    pub fn render(self) -> Response {
+        let context = Context::new();
+        match self.templates.render("signup.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(self.templates).render(),
+        }
+    }
+}

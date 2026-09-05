@@ -24,8 +24,8 @@ pub fn get_routes() -> Router<Arc<AppState>> {
             "/list/bought",
             post(list::post_remove_bought_items_from_list),
         )
-        .route("/item", get(item::get_item))
-        .route("/item/modify", post(item::post_modify_item))
+        .route("/item", get(item::get_display))
+        .route("/item/modify", post(item::post_modify))
         .route("/", get(index))
 }
 

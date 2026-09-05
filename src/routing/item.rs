@@ -11,7 +11,7 @@ use axum::{
 use serde::Deserialize;
 use std::{collections::HashMap, sync::Arc};
 
-pub async fn get_item(
+pub async fn get_display(
     Query(params): Query<HashMap<String, String>>,
     State(state): State<Arc<AppState>>,
 ) -> Response {
@@ -60,7 +60,7 @@ pub struct ModifyItemForm {
 }
 
 #[axum::debug_handler]
-pub async fn post_modify_item(
+pub async fn post_modify(
     State(state): State<Arc<AppState>>,
     Form(form): Form<ModifyItemForm>,
 ) -> Response {

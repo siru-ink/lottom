@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 -- Create relations needed for shared lists access
 CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL UNIQUE
 );
 CREATE TABLE IF NOT EXISTS lists_users_mapping (
     list_id INTEGER REFERENCES lists(id) NOT NULL,

@@ -155,15 +155,15 @@ impl<'a> InternalServerErrorPage<'a> {
 #[derive(Debug)]
 pub struct ListPage<'a> {
     items: Vec<Item>,
-    list_id: i32,
+    list: List,
     templates: &'a Tera,
 }
 
 impl<'a> ListPage<'a> {
-    pub fn new(templates: &'a Tera, items: Vec<Item>, list_id: i32) -> Self {
+    pub fn new(templates: &'a Tera, items: Vec<Item>, list: List) -> Self {
         ListPage {
             items,
-            list_id,
+            list,
             templates,
         }
     }
@@ -172,7 +172,7 @@ impl<'a> ListPage<'a> {
         let mut context = Context::new();
 
         context.insert("items", &self.items);
-        context.insert("list_id", &self.list_id);
+        context.insert("list", &self.list);
         context.insert("pagenav", &true);
 
         match self.templates.render("list.html", &context) {

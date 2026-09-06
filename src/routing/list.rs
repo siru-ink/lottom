@@ -38,7 +38,7 @@ pub async fn get_list(
         Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    ListPage::new(&state.tera, list_items, list_id).render()
+    ListPage::new(&state.tera, list_items, selected_list).render()
 }
 
 #[derive(Debug, Deserialize)]

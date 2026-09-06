@@ -3,8 +3,9 @@
 {% block title %}List | {% endblock title %}
 
 {% block content %}
+<h2>{{ list.name }}</h2>
 <form action="/list/bought" method="POST">
-    <input type="hidden" name="list_id" value="{{ list_id }}" />
+    <input type="hidden" name="list_id" value="{{ list.id }}" />
     {% for item in items %}
     <div>
         <input type="checkbox" name="item_ids" value="{{ item.id }}" />
@@ -15,9 +16,9 @@
     <button type="submit">Bought</button>
 </form>
 <div class="link_box">
-    <a href="/item/add?list_id={{ list_id }}">Add items</a>
+    <a href="/item/add?list_id={{ list.id }}">Add items</a>
 </div>
 <div class="link_box">
-    <a href="/list/modify?list_id={{ list_id }}">Modify list</a>
+    <a href="/list/modify?list_id={{ list.id }}">Modify list</a>
 </div>
 {% endblock content %}

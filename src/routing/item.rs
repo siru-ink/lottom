@@ -1,6 +1,7 @@
 use crate::{
     AppState,
     db::{item::Item, list::List, prefill_item::PrefillItem},
+    extractor::auth::AuthenticatedUser,
     template::{AddItemPage, InternalServerErrorPage, ItemPage, NotFoundPage},
 };
 use axum::{
@@ -14,6 +15,7 @@ use std::{collections::HashMap, sync::Arc};
 pub async fn get_display(
     Query(params): Query<HashMap<String, String>>,
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
 ) -> Response {
     let item_id_unparsed = match params.get("item_id") {
         Some(id) => id,
@@ -61,6 +63,7 @@ pub struct ModifyItemForm {
 
 pub async fn post_modify(
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
     Form(form): Form<ModifyItemForm>,
 ) -> Response {
     let img_path_parsed = if form.img_path.is_empty() {
@@ -87,6 +90,7 @@ pub async fn post_modify(
 pub async fn get_add(
     State(state): State<Arc<AppState>>,
     Query(params): Query<HashMap<String, String>>,
+    _user: AuthenticatedUser,
 ) -> Response {
     let prefill_items = match PrefillItem::get_all(&state.pg_pool).await {
         Ok(items) => items,
@@ -109,6 +113,7 @@ pub struct AddItemForm {
 
 pub async fn post_add(
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
     Form(form): Form<AddItemForm>,
 ) -> Response {
     println!("{:#?}", form);

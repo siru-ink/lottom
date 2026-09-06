@@ -49,6 +49,7 @@ pub struct BoughtListItemsForm {
 
 pub async fn post_remove_bought_items_from_list(
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
     Form(form): Form<BoughtListItemsForm>,
 ) -> Response {
     for item_id in form.item_ids {
@@ -62,6 +63,7 @@ pub async fn post_remove_bought_items_from_list(
 pub async fn get_modify(
     Query(params): Query<HashMap<String, String>>,
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
 ) -> Response {
     let list_id_unparsed = match params.get("list_id") {
         Some(id) => id,
@@ -89,6 +91,7 @@ pub struct ListModifyForm {
 
 pub async fn post_modify(
     State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
     Form(form): Form<ListModifyForm>,
 ) -> Response {
     let modified_list = List::new(form.id, form.name);

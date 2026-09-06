@@ -33,6 +33,8 @@ impl<'a> NotFoundPage<'a> {
             context.insert("explanation", &explanation);
         }
 
+        context.insert("pagenav", &true);
+
         match self.templates.render("not_found.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => {
@@ -130,7 +132,10 @@ impl<'a> InternalServerErrorPage<'a> {
     }
 
     pub fn render(self) -> Response {
-        let context = Context::new();
+        let mut context = Context::new();
+
+        context.insert("pagenav", &true);
+
         match self
             .templates
             .render("internal_server_error.html", &context)
@@ -168,6 +173,7 @@ impl<'a> ListPage<'a> {
 
         context.insert("items", &self.items);
         context.insert("list_id", &self.list_id);
+        context.insert("pagenav", &true);
 
         match self.templates.render("list.html", &context) {
             Ok(page) => Html(page).into_response(),
@@ -220,6 +226,7 @@ impl<'a> ItemPage<'a> {
     pub fn render(self) -> Response {
         let mut context = Context::new();
         context.insert("item", &self.item);
+        context.insert("pagenav", &true);
         match self.templates.render("item.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(self.templates).render(),
@@ -248,6 +255,7 @@ impl<'a> AddItemPage<'a> {
 
         context.insert("list_id", &self.list_id);
         context.insert("prefill_items", &self.prefill_items);
+        context.insert("pagenav", &true);
 
         match self.templates.render("add_item.html", &context) {
             Ok(page) => Html(page).into_response(),

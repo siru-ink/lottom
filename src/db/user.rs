@@ -1,4 +1,5 @@
 use crate::db::{list::List, list_user_map::ListUserMapping, roles::Roles};
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
 #[derive(Debug)]
@@ -24,10 +25,11 @@ impl User {
     }
 
     pub fn check_password(&self, comparison_password: &String) -> CheckPasswordResult {
-        if &self.password == comparison_password {
-            CheckPasswordResult::PasswordCorrect
-        } else {
-            CheckPasswordResult::PasswordWrong
+        let parsed_hash = PasswordHash::new(&self.password).unwrap();
+
+        match Argon2::default().verify_password(comparison_password.as_bytes(), &parsed_hash) {
+            Ok(_) => CheckPasswordResult::PasswordCorrect,
+            Err(_) => CheckPasswordResult::PasswordWrong,
         }
     }
 
@@ -45,10 +47,19 @@ impl User {
             None => return None,
         };
 
+        let argon2 = Argon2::default();
+        let new_password_bytes = new_password.as_bytes();
+        let password_hash = argon2
+            .hash_password(new_password_bytes)
+            .unwrap()
+            .to_string();
+
+        println!("{}", password_hash);
+
         let new_user_id = query!(
             "INSERT INTO users (name, password, default_list_id) VALUES ($1, $2, $3) RETURNING id",
             new_name,
-            new_password,
+            password_hash,
             new_list.get_id()
         )
         .fetch_one(pool)

@@ -104,7 +104,7 @@ impl<'a> LoginPage<'a> {
         context.insert("forward_to", &self.forward_to);
 
         if let Some(flash) = self.flash {
-            context.insert("flash", &flash);
+            context.insert("flash_message", &flash);
         }
 
         match self.templates.render("login.html", &context) {

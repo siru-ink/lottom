@@ -29,6 +29,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
             "/list/modify",
             get(list::get_modify).post(list::post_modify),
         )
+        .route("/list/share", get(list::get_share).post(list::post_share))
         .route("/item", get(item::get_display))
         .route("/item/modify", post(item::post_modify))
         .route("/item/add", get(item::get_add).post(item::post_add))

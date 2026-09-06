@@ -1,0 +1,46 @@
+{% extends '_base.html' %}
+
+{% block title %}Add Item | {% endblock title %}
+
+{% block content %}
+<form action="/list/share" method="POST">
+    <input type="text" id="searchInput" placeholder="Search..." />
+    <input type="hidden" name="list_id" value="{{ list_id }}" />
+    <br />
+    {% for user in users %}
+    <div>
+        <input type="checkbox" id="checkbox-{{ user.id }}" name="user_ids" value="{{ user.id }}" />
+        <label for="checkbox-{{ user.id }}">{{ user.name }} - {{ user.id }}</label>
+    </div>
+    {% endfor %}
+    <br />
+    <div>
+        <select name="role_id" required>
+            <option value="" selected hidden>--Please choose an option--</option>
+            <option value="2">Editor</option>
+            <option value="3">Viewer</option>
+        </select>
+    </div>
+    <br />
+    <button type="submit">Share list</button>
+</form>
+
+<script>
+  const searchInput = document.getElementById('searchInput');
+  // Select all div containers that hold the checkboxes
+  const itemDivs = document.querySelectorAll('form div');
+
+  searchInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase().trim();
+
+    itemDivs.forEach(div => {
+      // Get the label text within each div
+      const label = div.querySelector('label');
+      const text = label ? label.textContent.toLowerCase() : '';
+
+      // Show/hide the entire div based on match
+      div.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+</script>
+{% endblock content %}

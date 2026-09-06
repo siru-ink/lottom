@@ -1,8 +1,9 @@
 use crate::db::{list::List, list_user_map::ListUserMapping, roles::Roles};
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use serde::Serialize;
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct User {
     id: i32,
     name: String,
@@ -22,6 +23,12 @@ impl User {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub async fn list_all_others(&self, pool: &PgPool) -> Result<Vec<User>, SqlxError> {
+        query_as!(User, "SELECT * FROM users WHERE id <> $1", self.id)
+            .fetch_all(pool)
+            .await
     }
 
     pub fn check_password(&self, comparison_password: &String) -> CheckPasswordResult {

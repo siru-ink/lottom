@@ -1,4 +1,4 @@
-use crate::db::{item::Item, list::List, prefill_item::PrefillItem};
+use crate::db::{item::Item, list::List, prefill_item::PrefillItem, user::User};
 use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
@@ -303,6 +303,25 @@ impl<'a> ListModifyPage<'a> {
         match self.templates.render("list_modify.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(self.templates).render(),
+        }
+    }
+}
+
+pub struct ListSharePage {}
+
+impl ListSharePage {
+    pub fn render(tera: &Tera, list_id: i32, users: Vec<User>) -> Response {
+        let mut context = Context::new();
+
+        context.insert("list_id", &list_id);
+        context.insert("users", &users);
+
+        match tera.render("list_share.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(e) => {
+                println!("{:#?}", e);
+                InternalServerErrorPage::new(tera).render()
+            }
         }
     }
 }

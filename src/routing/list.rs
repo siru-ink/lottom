@@ -1,8 +1,8 @@
 use crate::{
     AppState,
-    db::{item::Item, list::List},
+    db::{item::Item, list::List, list_user_map::ListUserMapping},
     extractor::auth::AuthenticatedUser,
-    template::{InternalServerErrorPage, ListModifyPage, ListPage, NotFoundPage},
+    template::{InternalServerErrorPage, ListModifyPage, ListPage, ListSharePage, NotFoundPage},
 };
 use axum::{
     extract::{Query, State},
@@ -100,4 +100,50 @@ pub async fn post_modify(
         Some(list) => Redirect::to(&format!("/list?lit_id={}", list.get_id())).into_response(),
         None => InternalServerErrorPage::new(&state.tera).render(),
     }
+}
+
+pub async fn get_share(
+    Query(params): Query<HashMap<String, String>>,
+    State(state): State<Arc<AppState>>,
+    user: AuthenticatedUser,
+) -> Response {
+    let list_id_unparsed = match params.get("list_id") {
+        Some(id) => id,
+        None => return InternalServerErrorPage::new(&state.tera).render(),
+    };
+
+    let list_id = match list_id_unparsed.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
+    };
+
+    let db_user = user.inner();
+
+    let user_list = match db_user.list_all_others(&state.pg_pool).await {
+        Ok(listing) => listing,
+        Err(_) => {
+            println!("no users could be found");
+            return InternalServerErrorPage::new(&state.tera).render();
+        }
+    };
+
+    ListSharePage::render(&state.tera, list_id, user_list)
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ListShareForm {
+    list_id: i32,
+    user_ids: Vec<i32>,
+    role_id: i32,
+}
+
+pub async fn post_share(
+    State(state): State<Arc<AppState>>,
+    Form(form): Form<ListShareForm>,
+) -> Response {
+    for user_id in form.user_ids {
+        ListUserMapping::create(&state.pg_pool, user_id, form.list_id, form.role_id).await;
+    }
+
+    Redirect::to(&format!("/list?list_id={}", form.list_id)).into_response()
 }

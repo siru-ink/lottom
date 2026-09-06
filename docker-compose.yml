@@ -3,6 +3,10 @@ name: lottom
 services:
   app:
     image: lottom:latest
+    container_name: lottom-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8150:80"
     environment:
       - POSTGRES_USERNAME=test_pg_user
       - POSTGRES_PASSWORD=test_pg_passwd
@@ -10,13 +14,13 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_DATABASE_NAME=test_pg_master
       - COOKIEKEY=P31YCowDBtOOxe+YAQxkibdcDOVRyMhXEMe4LhFIEkHoMIT5P2z6Ii7xsuCLqhAVM6uaCrqJEJtm+PVaKVpakg==
-    ports:
-      - "127.0.0.1:8150:80"
-    restart: unless-stopped
 
   db:
       image: postgres:18-alpine
+      container_name: lottom-db
       restart: unless-stopped
+      ports:
+        - "5432"
       environment:
         POSTGRES_USER: test_pg_user
         POSTGRES_PASSWORD: test_pg_passwd
@@ -28,8 +32,6 @@ services:
         interval: 10s
         timeout: 5s
         retries: 5
-      ports:
-        - "5432"
 
 volumes:
   data:

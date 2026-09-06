@@ -79,7 +79,7 @@ pub async fn post_modify(
     );
 
     match Item::update(&state.pg_pool, &changed_item).await {
-        Some(item) => Redirect::to(&format!("/item?item_id={}", item.id())).into_response(),
+        Some(item) => Redirect::to(&format!("/list?list_id={}", item.list_id())).into_response(),
         None => InternalServerErrorPage::new(&state.tera).render(),
     }
 }

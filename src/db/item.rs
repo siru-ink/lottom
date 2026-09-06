@@ -39,6 +39,10 @@ impl Item {
         self.id
     }
 
+    pub fn list_id(self) -> i32 {
+        self.list_id
+    }
+
     pub async fn from_prefill_item(
         pool: &PgPool,
         list_id: i32,

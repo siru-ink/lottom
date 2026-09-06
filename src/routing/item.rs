@@ -116,8 +116,6 @@ pub async fn post_add(
     _user: AuthenticatedUser,
     Form(form): Form<AddItemForm>,
 ) -> Response {
-    println!("{:#?}", form);
-
     let list = match List::read(&state.pg_pool, form.list_id).await {
         Some(list) => list,
         None => return InternalServerErrorPage::new(&state.tera).render(),

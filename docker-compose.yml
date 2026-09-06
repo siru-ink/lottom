@@ -6,29 +6,30 @@ services:
     container_name: lottom-app
     restart: unless-stopped
     ports:
+      # Map your outside port as needed. It is recommended to only run this app
+      # behind a reverse proxy such as nginx, apache, or caddy.
       - "127.0.0.1:8150:80"
     environment:
-      - POSTGRES_USERNAME=test_pg_user
-      - POSTGRES_PASSWORD=test_pg_passwd
-      - POSTGRES_ADDRESS=db
-      - POSTGRES_PORT=5432
-      - POSTGRES_DATABASE_NAME=test_pg_master
-      - COOKIEKEY=P31YCowDBtOOxe+YAQxkibdcDOVRyMhXEMe4LhFIEkHoMIT5P2z6Ii7xsuCLqhAVM6uaCrqJEJtm+PVaKVpakg==
+      POSTGRES_USERNAME: lottom_user
+      POSTGRES_PASSWORD: Giggling-Synopses-Garnet-Dispersal6
+      POSTGRES_ADDRESS: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE_NAME: lottom_shard
+      # Generate a secret key using e.g. `openssl rand -hex 32`
+      COOKIEKEY: P31YCowDBtOOxe+YAQxkibdcDOVRyMhXEMe4LhFIEkHoMIT5P2z6Ii7xsuCLqhAVM6uaCrqJEJtm+PVaKVpakg==
 
   db:
       image: postgres:18-alpine
       container_name: lottom-db
       restart: unless-stopped
-      ports:
-        - "5432"
       environment:
-        POSTGRES_USER: test_pg_user
-        POSTGRES_PASSWORD: test_pg_passwd
-        POSTGRES_DB: test_pg_master
+        POSTGRES_USER: lottom_user
+        POSTGRES_PASSWORD: Giggling-Synopses-Garnet-Dispersal6
+        POSTGRES_DB: lottom_shard
       volumes:
         - data:/var/lib/postgresql
       healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U test_pg_user -d test_pg_master"]
+        test: ["CMD-SHELL", "pg_isready -U lottom_user -d lottom_shard"]
         interval: 10s
         timeout: 5s
         retries: 5

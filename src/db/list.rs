@@ -31,6 +31,10 @@ impl List {
         .await
     }
 
+    pub fn new(id: i32, name: String) -> Self {
+        List { id, name }
+    }
+
     pub async fn create(pool: &PgPool, new_name: &str) -> Option<List> {
         query_as!(
             List,

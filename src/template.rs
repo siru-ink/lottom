@@ -282,3 +282,27 @@ impl<'a> SignUpPage<'a> {
         }
     }
 }
+
+#[derive(Debug)]
+pub struct ListModifyPage<'a> {
+    list: List,
+    templates: &'a Tera,
+}
+
+impl<'a> ListModifyPage<'a> {
+    pub fn new(templates: &'a Tera, list: List) -> Self {
+        ListModifyPage { list, templates }
+    }
+
+    pub fn render(self) -> Response {
+        let mut context = Context::new();
+
+        context.insert("list", &self.list);
+        context.insert("pagenav", &true);
+
+        match self.templates.render("list_modify.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(self.templates).render(),
+        }
+    }
+}

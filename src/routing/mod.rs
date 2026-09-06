@@ -25,6 +25,10 @@ pub fn get_routes() -> Router<Arc<AppState>> {
             "/list/bought",
             post(list::post_remove_bought_items_from_list),
         )
+        .route(
+            "/list/modify",
+            get(list::get_modify).post(list::post_modify),
+        )
         .route("/item", get(item::get_display))
         .route("/item/modify", post(item::post_modify))
         .route("/item/add", get(item::get_add).post(item::post_add))

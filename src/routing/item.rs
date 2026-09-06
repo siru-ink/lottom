@@ -59,7 +59,6 @@ pub struct ModifyItemForm {
     estimated_euro_price: i32,
 }
 
-#[axum::debug_handler]
 pub async fn post_modify(
     State(state): State<Arc<AppState>>,
     Form(form): Form<ModifyItemForm>,
@@ -85,7 +84,6 @@ pub async fn post_modify(
     }
 }
 
-#[axum::debug_handler]
 pub async fn get_add(
     State(state): State<Arc<AppState>>,
     Query(params): Query<HashMap<String, String>>,
@@ -109,7 +107,6 @@ pub struct AddItemForm {
     list_id: i32,
 }
 
-#[axum::debug_handler]
 pub async fn post_add(
     State(state): State<Arc<AppState>>,
     Form(form): Form<AddItemForm>,

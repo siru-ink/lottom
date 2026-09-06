@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
-use tera::{Context, Tera, context};
+use tera::{Context, Tera};
 
 #[derive(Debug)]
 pub struct NotFoundPage<'a> {

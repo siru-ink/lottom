@@ -55,7 +55,7 @@ impl Item {
             &prefill_item.zh_name(),
             &prefill_item.de_name(),
             &None,
-            prefill_item.price(),
+            prefill_item.average_price(),
         )
         .await
     }

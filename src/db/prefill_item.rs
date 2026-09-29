@@ -36,4 +36,8 @@ impl PrefillItem {
     pub fn de_name(&self) -> String {
         self.de_name.clone()
     }
+
+    pub fn average_price(&self) -> i32 {
+        (self.euro_price_max + self.euro_price_min) / 2
+    }
 }

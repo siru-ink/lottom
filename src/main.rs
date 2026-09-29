@@ -61,7 +61,7 @@ async fn main() -> () {
         )
         .with_state(appstate);
 
-    let listener = TcpListener::bind("0.0.0.0:8150").await.unwrap();
+    let listener = TcpListener::bind("0.0.0.0:80").await.unwrap();
 
     serve(listener, app).await.unwrap();
 }

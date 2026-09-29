@@ -2,7 +2,10 @@ use crate::{
     AppState,
     db::{item::Item, list::List, list_user_map::ListUserMapping},
     extractor::auth::AuthenticatedUser,
-    template::{InternalServerErrorPage, ListModifyPage, ListPage, ListSharePage, NotFoundPage},
+    template::{
+        InternalServerErrorPage, ListModifyPage, ListPage, ListPageItem, ListSharePage,
+        NotFoundPage,
+    },
 };
 use axum::{
     extract::{Query, State},
@@ -38,7 +41,18 @@ pub async fn get_list(
         Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    ListPage::new(&state.tera, list_items, selected_list).render()
+    let list_page_items: Vec<ListPageItem> = list_items
+        .into_iter()
+        .map(|item| ListPageItem {
+            id: item.id(),
+            item_name: item.name(),
+            item_price: item.price() as f32 / 100.0,
+        })
+        .collect();
+
+    let list_price: f32 = list_page_items.iter().map(|item| item.item_price).sum();
+
+    ListPage::new(&state.tera, list_page_items, selected_list, list_price).render()
 }
 
 #[derive(Debug, Deserialize)]

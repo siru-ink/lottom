@@ -39,6 +39,18 @@ impl Item {
         self.list_id
     }
 
+    pub fn id(&self) -> i32 {
+        self.id
+    }
+
+    pub fn name(&self) -> String {
+        self.en_name.clone()
+    }
+
+    pub fn price(&self) -> i32 {
+        self.estimated_euro_price
+    }
+
     pub async fn from_prefill_item(
         pool: &PgPool,
         list_id: i32,

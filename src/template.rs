@@ -3,6 +3,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
+use serde::Serialize;
 use tera::{Context, Tera};
 
 #[derive(Debug)]
@@ -154,16 +155,25 @@ impl<'a> InternalServerErrorPage<'a> {
 
 #[derive(Debug)]
 pub struct ListPage<'a> {
-    items: Vec<Item>,
+    items: Vec<ListPageItem>,
     list: List,
+    list_price: f32,
     templates: &'a Tera,
 }
 
+#[derive(Serialize, Debug)]
+pub struct ListPageItem {
+    pub id: i32,
+    pub item_name: String,
+    pub item_price: f32,
+}
+
 impl<'a> ListPage<'a> {
-    pub fn new(templates: &'a Tera, items: Vec<Item>, list: List) -> Self {
+    pub fn new(templates: &'a Tera, items: Vec<ListPageItem>, list: List, list_price: f32) -> Self {
         ListPage {
             items,
             list,
+            list_price,
             templates,
         }
     }
@@ -173,6 +183,7 @@ impl<'a> ListPage<'a> {
 
         context.insert("items", &self.items);
         context.insert("list", &self.list);
+        context.insert("list_price", &self.list_price);
         context.insert("pagenav", &true);
 
         match self.templates.render("list.html", &context) {

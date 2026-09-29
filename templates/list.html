@@ -6,10 +6,11 @@
 <h2>{{ list.name }}</h2>
 <form action="/list/bought" method="POST">
     <input type="hidden" name="list_id" value="{{ list.id }}" />
+    <p>Total shopping list estimated price: €{{ list_price | round(method="ceil", precision=2) }}</p>
     {% for item in items %}
     <div>
         <input type="checkbox" name="item_ids" value="{{ item.id }}" />
-        <a href="/item?item_id={{ item.id }}">{{ item.en_name }}</a>
+        <a href="/item?item_id={{ item.id }}">{{ item.item_name }} (€{{ item.item_price | round(method="ceil", precision=2) }})</a>
     </div>
     {% endfor %}
     <br />

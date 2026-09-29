@@ -1,11 +1,12 @@
 use crate::{cookies::CookieValue, db::user::User};
 use chrono::{DateTime, Utc};
-use sqlx::{Error as SqlxError, PgPool, query, query_as};
+use sqlx::{PgPool, query_as};
 
 #[derive(Debug)]
 pub struct Session {
     id: i32,
     user_id: i32,
+    #[allow(dead_code)]
     start: DateTime<Utc>,
 }
 
@@ -34,31 +35,5 @@ impl Session {
             .fetch_optional(pool)
             .await
             .ok()?
-    }
-
-    pub async fn update(pool: &PgPool, session: &Session) -> Option<Session> {
-        query_as!(
-            Session,
-            "UPDATE sessions \
-             SET user_id = $1, start = $2 \
-             WHERE id = $3 \
-             RETURNING id, user_id, start",
-            session.user_id,
-            session.start,
-            session.id
-        )
-        .fetch_optional(pool)
-        .await
-        .ok()?
-    }
-
-    pub async fn delete(pool: &PgPool, session: &Session) -> Result<(), SqlxError> {
-        match query!("DELETE FROM sessions WHERE id = $1", session.id)
-            .execute(pool)
-            .await
-        {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
     }
 }

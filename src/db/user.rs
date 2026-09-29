@@ -88,28 +88,4 @@ impl User {
             .await
             .ok()?
     }
-
-    pub async fn update(pool: &PgPool, user: &User) -> Option<User> {
-        query_as!(
-            User,
-            "UPDATE users SET name = $1, password = $2, default_list_id = $3 WHERE id = $4 RETURNING id, name, password, default_list_id",
-            user.name,
-            user.password,
-            user.default_list_id,
-            user.id
-        )
-        .fetch_optional(pool)
-        .await
-        .ok()?
-    }
-
-    pub async fn delete(pool: &PgPool, user: &User) -> Result<(), SqlxError> {
-        match query!("DELETE FROM users WHERE id = $1", user.id)
-            .execute(pool)
-            .await
-        {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
-    }
 }

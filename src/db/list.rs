@@ -1,6 +1,6 @@
 use crate::db::item::Item;
 use serde::Serialize;
-use sqlx::{Error as SqlxError, PgPool, query, query_as};
+use sqlx::{Error as SqlxError, PgPool, query_as};
 
 #[derive(Debug, Serialize)]
 pub struct List {
@@ -63,15 +63,5 @@ impl List {
         .fetch_optional(pool)
         .await
         .ok()?
-    }
-
-    pub async fn delete(pool: &PgPool, list: &List) -> Result<(), SqlxError> {
-        match query!("DELETE FROM lists WHERE id = $1", list.id)
-            .execute(pool)
-            .await
-        {
-            Ok(_) => Ok(()),
-            Err(e) => return Err(e),
-        }
     }
 }

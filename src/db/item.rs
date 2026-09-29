@@ -35,10 +35,6 @@ impl Item {
         }
     }
 
-    pub fn id(self) -> i32 {
-        self.id
-    }
-
     pub fn list_id(self) -> i32 {
         self.list_id
     }

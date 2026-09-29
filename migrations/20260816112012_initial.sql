@@ -43,7 +43,8 @@ CREATE TABLE IF NOT EXISTS prefill_items (
     en_name TEXT UNIQUE NOT NULL,
     zh_name TEXT UNIQUE NOT NULL,
     de_name TEXT UNIQUE NOT NULL,
-    euro_price INTEGER NOT NULL
+    euro_price_max INTEGER NOT NULL,
+    euro_price_min INTEGER NOT NULL
 );
 
 -- Create default user list access roles

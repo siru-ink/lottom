@@ -1,5 +1,5 @@
 -- Add default items to the saved items table
-INSERT INTO prefill_items (en_name, zh_name, de_name, euro_price)
+INSERT INTO prefill_items (en_name, zh_name, de_name, euro_price_max, euro_price_min)
 VALUES
     ('Cow milk', '牛奶', 'Kuhmilch', 95, 95),
     ('Chicken mortadella', '鸡肉莫塔德拉香肠', 'Geflügel-Mortadella', 129, 129),
@@ -10,5 +10,5 @@ VALUES
     ('Tortilla chips', '玉米片', 'Totilla Chips', 99, 99),
     ('Soy-Yoghurt Alpro Strawberry', 'Alpro草莓味豆酸奶', 'Soja Joghurt Alpro Erdbeere', 219, 219),
     ('Soy-Yoghurt Alpro Natural', 'Alpro原味豆酸奶', 'Soja Joghurt Alpro Natur', 219, 219),
-    ('Soy-Yoghurt Alpro Peach', 'Alpro桃味豆酸奶', 'Soja Joghurt Alpro Pfirsich', 219, 219),
+    ('Soy-Yoghurt Alpro Peach', 'Alpro桃味豆酸奶', 'Soja Joghurt Alpro Pfirsich', 219, 219)
 ;

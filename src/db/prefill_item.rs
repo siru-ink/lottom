@@ -7,7 +7,8 @@ pub struct PrefillItem {
     en_name: String,
     zh_name: String,
     de_name: String,
-    euro_price: i32,
+    euro_price_max: i32,
+    euro_price_min: i32,
 }
 
 impl PrefillItem {
@@ -34,9 +35,5 @@ impl PrefillItem {
 
     pub fn de_name(&self) -> String {
         self.de_name.clone()
-    }
-
-    pub fn price(&self) -> i32 {
-        self.euro_price
     }
 }

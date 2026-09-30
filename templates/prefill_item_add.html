@@ -1,0 +1,10 @@
+{% extends '_base.html' %}
+
+{% block title %}List | {% endblock title %}
+
+{% block content %}
+<form action="prefill/add" method="post" enctype="multipart/form" >
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+</form>
+{% endblock content %}

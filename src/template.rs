@@ -336,3 +336,15 @@ impl ListSharePage {
         }
     }
 }
+
+pub struct PrefillItemAddPage {}
+
+impl PrefillItemAddPage {
+    pub fn show(tera: &Tera) -> Response {
+        let context = Context::new();
+        match tera.render("prefill_item_add.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(_) => InternalServerErrorPage::new(tera).render(),
+        }
+    }
+}

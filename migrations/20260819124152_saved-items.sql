@@ -10,5 +10,8 @@ VALUES
     ('Tortilla chips', '玉米片', 'Totilla Chips', 99, 99),
     ('Soy-Yoghurt Alpro Strawberry', 'Alpro草莓味豆酸奶', 'Soja Joghurt Alpro Erdbeere', 219, 219),
     ('Soy-Yoghurt Alpro Natural', 'Alpro原味豆酸奶', 'Soja Joghurt Alpro Natur', 219, 219),
-    ('Soy-Yoghurt Alpro Peach', 'Alpro桃味豆酸奶', 'Soja Joghurt Alpro Pfirsich', 219, 219)
+    ('Soy-Yoghurt Alpro Peach', 'Alpro桃味豆酸奶', 'Soja Joghurt Alpro Pfirsich', 219, 219),
+    ('Chicken breast', '', 'Hühnerbrust', 699, 699),
+    ('Beef soup meat', '', 'Rindersuppenfleisch', 1, 1),
+    ('Greek Yoghurt Elinas Blueberry', '', 'Griechischer Joghurt Elinas Heidelbeere', 229)
 ;

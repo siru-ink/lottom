@@ -14,6 +14,7 @@ use std::sync::Arc;
 mod auth;
 mod item;
 mod list;
+mod prefill;
 mod user;
 
 pub fn get_routes() -> Router<Arc<AppState>> {
@@ -36,6 +37,10 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         .route(
             "/user/signup",
             get(user::get_signup).post(user::post_signup),
+        )
+        .route(
+            "/prefill/add",
+            get(prefill::get_add).post(prefill::post_add),
         )
         .route("/", get(index))
 }

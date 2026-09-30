@@ -341,7 +341,10 @@ pub struct PrefillItemAddPage {}
 
 impl PrefillItemAddPage {
     pub fn show(tera: &Tera) -> Response {
-        let context = Context::new();
+        let mut context = Context::new();
+
+        context.insert("pagenav", &true);
+
         match tera.render("prefill_item_add.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(tera).render(),

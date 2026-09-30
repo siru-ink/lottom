@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    db::prefill_item::PartialPrefillItem,
+    db::prefill_item::{PartialPrefillItem, PrefillItem},
     extractor::{auth::AuthenticatedUser, flash::Flash},
     template::PrefillItemAddPage,
 };
@@ -15,7 +15,11 @@ pub async fn get_add(State(state): State<Arc<AppState>>, _user: AuthenticatedUse
     PrefillItemAddPage::show(&state.tera)
 }
 
-pub async fn post_add(flash: Flash, mut files: Multipart) -> Response {
+pub async fn post_add(
+    State(state): State<Arc<AppState>>,
+    flash: Flash,
+    mut files: Multipart,
+) -> Response {
     let optional_file = match files.next_field().await {
         Ok(option) => option,
         Err(_) => {
@@ -58,9 +62,17 @@ pub async fn post_add(flash: Flash, mut files: Multipart) -> Response {
         }
     };
 
-    flash.set("Prefill items updated successfully.");
+    match PrefillItem::update_items(&state.pg_pool, parsed_content).await {
+        Ok(_) => {
+            flash.set("Prefill items updated successfully.");
 
-    Redirect::to("/").into_response()
+            Redirect::to("/").into_response()
+        }
+        Err(_) => {
+            flash.set("Error encountered applying database upsert.");
+            return Redirect::to("/prefill/add").into_response();
+        }
+    }
 }
 
 fn parse_prefill_file(text: &str) -> Option<Vec<PartialPrefillItem>> {

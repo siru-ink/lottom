@@ -6,6 +6,7 @@ use crate::{
 };
 use axum::{
     extract::State,
+    http::{HeaderValue, header},
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::{Form, Multipart};
@@ -149,4 +150,29 @@ pub async fn post_new(
             Redirect::to("/prefill/new").into_response()
         }
     }
+}
+
+pub async fn get_export(State(state): State<Arc<AppState>>, flash: Flash) -> Response {
+    let prefill_items = match PrefillItem::get_all(&state.pg_pool).await {
+        Ok(items) => items,
+        Err(e) => {
+            eprintln!("ERR: Failed to retrieve all prefill items: {}", e);
+            flash.set("Failed to retrive all prefill items.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let content = prefill_items
+        .iter()
+        .map(|item| item.file_repr())
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    let mut response = content.into_response();
+    response.headers_mut().insert(
+        header::CONTENT_DISPOSITION,
+        HeaderValue::from_static("attachment; filename=\"export.txt\""),
+    );
+
+    response
 }

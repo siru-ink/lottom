@@ -53,6 +53,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
             "/prefill/new",
             get(prefill::get_new).post(prefill::post_new),
         )
+        .route("/prefill/export", get(prefill::get_export))
         .route("/", get(index))
 }
 

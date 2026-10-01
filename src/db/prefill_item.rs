@@ -94,4 +94,11 @@ impl PrefillItem {
     pub fn average_price(&self) -> i32 {
         (self.euro_price_max + self.euro_price_min) / 2
     }
+
+    pub fn file_repr(&self) -> String {
+        format!(
+            "{}|{}|{}|{}|{}",
+            self.en_name, self.zh_name, self.de_name, self.euro_price_max, self.euro_price_min
+        )
+    }
 }

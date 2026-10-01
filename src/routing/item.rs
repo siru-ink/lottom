@@ -339,7 +339,7 @@ pub async fn get_img(
     };
 
     // Send the image data back to client by reading the file at /uploads/<image_path>
-    let full_path = format!("/uploads/{}", image_path);
+    let full_path = format!("uploads/{}", image_path);
 
     let mut file = match File::open(&full_path).await {
         Ok(file) => file,

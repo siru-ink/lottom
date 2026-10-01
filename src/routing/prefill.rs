@@ -88,20 +88,27 @@ fn parse_prefill_file(text: &str) -> Option<Vec<PartialPrefillItem>> {
             continue;
         }
 
-        let cols: Vec<&str> = line.split("|").collect();
+        let cols: Vec<&str> = line.split("|").map(|col| col.trim()).collect();
 
         if cols.len() != 5 {
+            eprintln!("The file included a line with the incorrect column count.");
             return None;
         }
 
         let max_price = match cols[3].parse::<i32>() {
             Ok(num) => num,
-            Err(_) => return None,
+            Err(_) => {
+                eprintln!("The file included a line with a non-numeric max price.");
+                return None;
+            }
         };
 
         let min_price = match cols[4].parse::<i32>() {
             Ok(num) => num,
-            Err(_) => return None,
+            Err(_) => {
+                eprintln!("The file included a line with a non-numeric min price.");
+                return None;
+            }
         };
 
         let item = PartialPrefillItem {

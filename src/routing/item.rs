@@ -100,6 +100,7 @@ pub async fn post_modify(
 pub async fn get_add(
     State(state): State<Arc<AppState>>,
     Query(params): Query<HashMap<String, String>>,
+    flash: Flash,
     _user: AuthenticatedUser,
 ) -> Response {
     let prefill_items = match PrefillItem::get_all(&state.pg_pool).await {
@@ -112,7 +113,7 @@ pub async fn get_add(
         None => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    AddItemPage::new(&state.tera, prefill_items, list_id.to_owned()).render()
+    AddItemPage::new(&state.tera, prefill_items, list_id.to_owned(), flash.get()).render()
 }
 
 #[derive(Debug, Deserialize)]

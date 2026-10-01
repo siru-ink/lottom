@@ -260,14 +260,21 @@ impl<'a> ItemPage<'a> {
 pub struct AddItemPage<'a> {
     prefill_items: Vec<PrefillItem>,
     list_id: String,
+    flash: Option<String>,
     templates: &'a Tera,
 }
 
 impl<'a> AddItemPage<'a> {
-    pub fn new(templates: &'a Tera, prefill_items: Vec<PrefillItem>, list_id: String) -> Self {
+    pub fn new(
+        templates: &'a Tera,
+        prefill_items: Vec<PrefillItem>,
+        list_id: String,
+        flash: Option<String>,
+    ) -> Self {
         AddItemPage {
             prefill_items,
             list_id,
+            flash,
             templates,
         }
     }
@@ -278,6 +285,9 @@ impl<'a> AddItemPage<'a> {
         context.insert("list_id", &self.list_id);
         context.insert("prefill_items", &self.prefill_items);
         context.insert("pagenav", &true);
+        if let Some(flash) = self.flash {
+            context.insert("flash_message", &flash);
+        }
 
         match self.templates.render("add_item.html", &context) {
             Ok(page) => Html(page).into_response(),
@@ -382,10 +392,11 @@ impl ItemAddImagePage {
 pub struct PrefillItemNewPage {}
 
 impl PrefillItemNewPage {
-    pub fn show(tera: &Tera) -> Response {
+    pub fn show(tera: &Tera, list_id: i32) -> Response {
         let mut context = Context::new();
 
         context.insert("pagenav", &true);
+        context.insert("list_id", &list_id);
 
         match tera.render("prefill_item_new.html", &context) {
             Ok(page) => Html(page).into_response(),

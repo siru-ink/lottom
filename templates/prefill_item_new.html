@@ -3,7 +3,7 @@
 {% block title %}Create Prefill Item | {% endblock title %}
 
 {% block content %}
-<form action="/prefill/new" method="POST">
+<form action="/prefill/new?list_id={{ list_id }}" method="POST">
     <label for="en_name">English Name:</label>
     <input type="text" name="en_name" />
     <label for="zh_name">Chinese Name:</label>

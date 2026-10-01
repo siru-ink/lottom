@@ -5,13 +5,13 @@ use crate::{
     template::{PrefillItemAddPage, PrefillItemNewPage},
 };
 use axum::{
-    extract::State,
+    extract::{Query, State},
     http::{HeaderValue, header},
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::{Form, Multipart};
 use serde::Deserialize;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 pub async fn get_add(State(state): State<Arc<AppState>>, _user: AuthenticatedUser) -> Response {
     PrefillItemAddPage::show(&state.tera)
@@ -125,8 +125,31 @@ fn parse_prefill_file(text: &str) -> Option<Vec<PartialPrefillItem>> {
     Some(items)
 }
 
-pub async fn get_new(State(state): State<Arc<AppState>>, _user: AuthenticatedUser) -> Response {
-    PrefillItemNewPage::show(&state.tera)
+pub async fn get_new(
+    State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
+    Query(params): Query<HashMap<String, String>>,
+) -> Response {
+    let raw_list_id = match params.get("list_id") {
+        Some(id) => id,
+        None => {
+            eprintln!("ERR: New prefill item route called without list id parameter.",);
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let list_id = match raw_list_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(e) => {
+            eprintln!(
+                "ERR: List id passed to new prefill item route was not a number: {}",
+                e
+            );
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    PrefillItemNewPage::show(&state.tera, list_id)
 }
 
 #[derive(Deserialize)]
@@ -140,21 +163,42 @@ pub async fn post_new(
     State(state): State<Arc<AppState>>,
     _user: AuthenticatedUser,
     flash: Flash,
+    Query(params): Query<HashMap<String, String>>,
     Form(form): Form<CreatePrefillItemForm>,
 ) -> Response {
     let item = PartialPrefillItem::new(form.en_name, form.zh_name, form.de_name);
+    let items = vec![item]; // to reuse existing update fn
 
-    let items = vec![item];
+    let raw_list_id = match params.get("list_id") {
+        Some(id) => id,
+        None => {
+            eprintln!("ERR: New prefill item post route called without list id param.");
+            flash.set("New prefill item route must be called with list_id parameter.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let list_id = match raw_list_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(e) => {
+            eprintln!(
+                "ERR: New prefill item post route called with non-numeric list id param: {}",
+                e
+            );
+            flash.set("New prefill item route must be called with a numeric list_id parameter.");
+            return Redirect::to("/").into_response();
+        }
+    };
 
     match PrefillItem::update_items(&state.pg_pool, items).await {
         Ok(_) => {
             flash.set("New prefill item created successfully.");
-            Redirect::to("/").into_response()
+            Redirect::to(&format!("/item/add?list_id={}", list_id)).into_response()
         }
         Err(e) => {
             eprintln!("ERR: Failed to create new prefill item: {}", e);
             flash.set("Creating new prefill item failed. Please try again.");
-            Redirect::to("/prefill/new").into_response()
+            Redirect::to(&format!("/prefill/new?list_id={}", list_id)).into_response()
         }
     }
 }

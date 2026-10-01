@@ -1,5 +1,8 @@
+use std::path::PathBuf;
+
 use serde::Serialize;
 use sqlx::{Error as SqlxError, PgPool, query, query_as};
+use tokio::fs;
 
 use crate::db::prefill_item::PrefillItem;
 
@@ -157,6 +160,11 @@ impl Item {
     }
 
     pub async fn delete(pool: &PgPool, item: &Item) -> Result<(), SqlxError> {
+        if let Some(img_path) = item.img_path.as_ref() {
+            let full_path = PathBuf::from("uploads").join(img_path);
+            let _ = fs::remove_file(full_path).await;
+        }
+
         match query!("DELETE FROM items WHERE id = $1", item.id)
             .execute(pool)
             .await

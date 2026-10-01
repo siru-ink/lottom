@@ -79,6 +79,13 @@ fn parse_prefill_file(text: &str) -> Option<Vec<PartialPrefillItem>> {
     let mut items: Vec<PartialPrefillItem> = Vec::new();
 
     for line in text.lines() {
+        if line.starts_with("#") {
+            continue;
+        }
+        if line.is_empty() {
+            continue;
+        }
+
         let cols: Vec<&str> = line.split("|").collect();
 
         if cols.len() != 5 {

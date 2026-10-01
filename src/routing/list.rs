@@ -59,6 +59,7 @@ pub async fn get_list(
 #[derive(Debug, Deserialize)]
 pub struct BoughtListItemsForm {
     list_id: i32,
+    #[serde(default)]
     item_ids: Vec<i32>,
 }
 

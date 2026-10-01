@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    extractor::auth::AuthenticatedUser,
+    extractor::{auth::AuthenticatedUser, flash::Flash},
     template::{IndexPage, InternalServerErrorPage},
 };
 use axum::{
@@ -50,7 +50,11 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         .route("/", get(index))
 }
 
-async fn index(State(state): State<Arc<AppState>>, user: AuthenticatedUser) -> Response {
+async fn index(
+    State(state): State<Arc<AppState>>,
+    user: AuthenticatedUser,
+    flash: Flash,
+) -> Response {
     let user = user.inner();
 
     let user_lists = match user.lists(&state.pg_pool).await {
@@ -58,5 +62,5 @@ async fn index(State(state): State<Arc<AppState>>, user: AuthenticatedUser) -> R
         Err(_) => return InternalServerErrorPage::new(&state.tera).render(),
     };
 
-    IndexPage::new(&state.tera, user.name(), user_lists).render()
+    IndexPage::new(&state.tera, user.name(), user_lists, flash.get()).render()
 }

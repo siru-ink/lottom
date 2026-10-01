@@ -201,14 +201,21 @@ impl<'a> ListPage<'a> {
 pub struct IndexPage<'a> {
     username: &'a str,
     lists: Vec<List>,
+    flash: Option<String>,
     templates: &'a Tera,
 }
 
 impl<'a> IndexPage<'a> {
-    pub fn new(templates: &'a Tera, username: &'a str, lists: Vec<List>) -> Self {
+    pub fn new(
+        templates: &'a Tera,
+        username: &'a str,
+        lists: Vec<List>,
+        flash: Option<String>,
+    ) -> Self {
         IndexPage {
             username,
             lists,
+            flash,
             templates,
         }
     }
@@ -217,6 +224,9 @@ impl<'a> IndexPage<'a> {
         let mut context = Context::new();
         context.insert("username", &self.username);
         context.insert("lists", &self.lists);
+        if let Some(flash) = self.flash {
+            context.insert("flash_message", &flash);
+        }
         match self.templates.render("index.html", &context) {
             Ok(page) => Html(page).into_response(),
             Err(_) => InternalServerErrorPage::new(self.templates).render(),

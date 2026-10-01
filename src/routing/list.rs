@@ -47,6 +47,7 @@ pub async fn get_list(
             id: item.id(),
             item_name: item.name(),
             item_price: item.price() as f32 / 100.0,
+            has_img: item.has_img(),
         })
         .collect();
 

@@ -5,13 +5,21 @@ use crate::{
     template::{AddItemPage, InternalServerErrorPage, ItemAddImagePage, ItemPage, NotFoundPage},
 };
 use axum::{
+    body::{Body, Bytes},
     extract::{Query, State},
+    http::header,
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::{Form, Multipart};
+use mime_guess::from_path;
 use serde::Deserialize;
-use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::Arc};
-use tokio::fs;
+use std::{collections::HashMap, io::Write, path::PathBuf, sync::Arc};
+use tokio::{
+    fs::{self, File},
+    io::AsyncReadExt,
+};
+use tokio_stream::StreamExt;
+use tokio_util::io::ReaderStream;
 use uuid::Uuid;
 
 pub async fn get_display(
@@ -298,4 +306,82 @@ pub async fn post_add_img(
             return Redirect::to("/").into_response();
         }
     }
+}
+
+pub async fn get_img(
+    Query(params): Query<HashMap<String, String>>,
+    State(state): State<Arc<AppState>>,
+    flash: Flash,
+    _user: AuthenticatedUser,
+) -> Response {
+    let item_id_unparsed = match params.get("item_id") {
+        Some(id) => id,
+        None => {
+            flash.set("Item picture could not be found.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let item_id = match item_id_unparsed.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => {
+            flash.set("Item id could not be parsed as a number.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let image_path = match Item::get_img_path_by_id(&state.pg_pool, item_id).await {
+        Some(path) => path,
+        None => {
+            flash.set("Item does not have an associated image.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    // Send the image data back to client by reading the file at /uploads/<image_path>
+    let full_path = format!("/uploads/{}", image_path);
+
+    let mut file = match File::open(&full_path).await {
+        Ok(file) => file,
+        Err(_) => {
+            flash.set("Item picture could not be found on disk.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    // Read the first chunk to sniff the format.
+    let mut header = [0u8; 512];
+    let n = match file.read(&mut header).await {
+        Ok(n) => n,
+        Err(_) => {
+            flash.set("Item picture could not be read.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    // Identify the image type from magic bytes; fall back to extension.
+    let mime_type = infer::get(&header[..n])
+        .map(|kind| kind.mime_type())
+        .and_then(|s| s.parse::<mime::Mime>().ok())
+        .or_else(|| {
+            from_path(&full_path)
+                .first()
+                .filter(|m| m.type_() == mime::IMAGE)
+        });
+
+    let mime_type = match mime_type {
+        Some(m) => m,
+        None => {
+            flash.set("File is not a recognized image.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    // Re-include the sniffed bytes, then stream the remainder of the file.
+    let prefix = Bytes::copy_from_slice(&header[..n]);
+    let stream = ReaderStream::new(file);
+    let body = Body::from_stream(tokio_stream::once(Ok(prefix)).chain(stream));
+
+    let headers = [(header::CONTENT_TYPE, mime_type.as_ref())];
+    (headers, body).into_response()
 }

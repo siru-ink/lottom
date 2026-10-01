@@ -38,6 +38,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
             "/item/img/add",
             get(item::get_add_img).post(item::post_add_img),
         )
+        .route("/item/img/get", get(item::get_img))
         .route(
             "/user/signup",
             get(user::get_signup).post(user::post_signup),

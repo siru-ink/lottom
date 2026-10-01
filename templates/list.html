@@ -10,7 +10,13 @@
     {% for item in items %}
     <div>
         <input type="checkbox" name="item_ids" value="{{ item.id }}" />
-        <a href="/item?item_id={{ item.id }}">{{ item.item_name }} (€{{ item.item_price | round(method="ceil", precision=2) }})</a>
+        <a href="/item?item_id={{ item.id }}">
+            {{ item.item_name }}
+            (€{{ item.item_price | round(method="ceil", precision=2) }})
+        </a>
+        {% if item.has_img %}
+        <a href="/item/img/get?item_id={{ item.id }}">(img)</a>
+        {% endif %}
     </div>
     {% endfor %}
     <br />

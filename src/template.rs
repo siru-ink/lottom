@@ -166,6 +166,7 @@ pub struct ListPageItem {
     pub id: i32,
     pub item_name: String,
     pub item_price: f32,
+    pub has_img: bool,
 }
 
 impl<'a> ListPage<'a> {

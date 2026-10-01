@@ -35,6 +35,25 @@ impl Item {
         }
     }
 
+    pub fn has_img(&self) -> bool {
+        if let Some(_) = self.img_path {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub async fn get_img_path_by_id(pool: &PgPool, item_id: i32) -> Option<String> {
+        match query_as!(Item, "SELECT * FROM items WHERE id = $1", item_id)
+            .fetch_optional(pool)
+            .await
+        {
+            Ok(Some(item)) => item.img_path,
+            Ok(_) => None,
+            Err(_) => None,
+        }
+    }
+
     pub fn set_img_path(mut self, img_path: String) -> Item {
         self.img_path = Some(img_path);
         return self;

@@ -260,7 +260,6 @@ pub async fn post_add_img(
         while let Ok(Some(_)) = field.chunk().await {}
     }
 
-    // Now you have both:
     let Some(item_id) = item_id else {
         flash.set("Missing item id.");
         return Redirect::to("/prefill/add").into_response();
@@ -269,14 +268,6 @@ pub async fn post_add_img(
         flash.set("You must upload an item image file here.");
         return Redirect::to("/prefill/add").into_response();
     };
-
-    // let item_id = match raw_item_id {
-    //     Some(val) => val,
-    //     None => {
-    //         flash.set("Missing item id.");
-    //         return Redirect::to("/").into_response();
-    //     }
-    // };
 
     let item_id_num = match item_id.parse::<i32>() {
         Ok(id) => id,

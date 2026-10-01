@@ -8,9 +8,11 @@ use axum::{
     extract::{Query, State},
     response::{IntoResponse, Redirect, Response},
 };
-use axum_extra::extract::Form;
+use axum_extra::extract::{Form, Multipart};
 use serde::Deserialize;
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, fs::File, io::Write, path::PathBuf, sync::Arc};
+use tokio::fs;
+use uuid::Uuid;
 
 pub async fn get_display(
     Query(params): Query<HashMap<String, String>>,
@@ -162,4 +164,138 @@ pub async fn get_add_img(
     };
 
     ItemAddImagePage::show(&state.tera, &item)
+}
+
+pub async fn post_add_img(
+    State(state): State<Arc<AppState>>,
+    flash: Flash,
+    _user: AuthenticatedUser,
+    mut files: Multipart,
+) -> Response {
+    let mut saved_name: Option<String> = None;
+    let mut item_id: Option<String> = None;
+
+    while let Ok(Some(mut field)) = files.next_field().await {
+        let field_name = field.name().unwrap_or("").to_owned();
+
+        if field_name == "item_id" {
+            match field.text().await {
+                Ok(value) => item_id = Some(value),
+                Err(_) => {
+                    flash.set("Could not read item id.");
+                    return Redirect::to("/prefill/add").into_response();
+                }
+            }
+            continue;
+        }
+
+        if field_name == "item_image" {
+            let raw_file_name = match field.file_name() {
+                Some(name) if !name.is_empty() => name.to_owned(),
+                _ => {
+                    while let Ok(Some(_)) = field.chunk().await {}
+                    continue;
+                }
+            };
+
+            let extension = std::path::Path::new(&raw_file_name)
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or("");
+
+            let uuid = Uuid::new_v4();
+            let file_name = if extension.is_empty() {
+                uuid.to_string()
+            } else {
+                format!("{uuid}.{extension}")
+            };
+
+            let save_path = PathBuf::from("uploads/").join(&file_name);
+
+            let mut server_file = match File::create(&save_path) {
+                Ok(f) => f,
+                Err(_) => {
+                    flash.set("Could not create new file on server.");
+                    return Redirect::to("/").into_response();
+                }
+            };
+
+            loop {
+                match field.chunk().await {
+                    Ok(Some(chunk)) => {
+                        if server_file.write_all(&chunk).is_err() {
+                            let _ = fs::remove_file(&save_path).await;
+                            flash.set("Error writing to file on server.");
+                            return Redirect::to("/").into_response();
+                        }
+                    }
+                    Ok(None) => break,
+                    Err(_) => {
+                        let _ = fs::remove_file(&save_path).await;
+                        flash.set("Error writing to file on server.");
+                        return Redirect::to("/").into_response();
+                    }
+                }
+            }
+
+            if server_file.flush().is_err() {
+                let _ = fs::remove_file(&save_path).await;
+                flash.set("Error writing to file on server.");
+                return Redirect::to("/").into_response();
+            }
+            drop(server_file);
+            saved_name = Some(file_name);
+            continue;
+        }
+
+        // Drain any unknown fields so the stream doesn't get stuck
+        while let Ok(Some(_)) = field.chunk().await {}
+    }
+
+    // Now you have both:
+    let Some(item_id) = item_id else {
+        flash.set("Missing item id.");
+        return Redirect::to("/prefill/add").into_response();
+    };
+    let Some(file_name) = saved_name else {
+        flash.set("You must upload an item image file here.");
+        return Redirect::to("/prefill/add").into_response();
+    };
+
+    // let item_id = match raw_item_id {
+    //     Some(val) => val,
+    //     None => {
+    //         flash.set("Missing item id.");
+    //         return Redirect::to("/").into_response();
+    //     }
+    // };
+
+    let item_id_num = match item_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => {
+            flash.set("The item id must be a valid number.");
+            return Redirect::to("/prefill/add").into_response();
+        }
+    };
+
+    let item = match Item::read(&state.pg_pool, item_id_num).await {
+        Some(item) => item,
+        None => {
+            flash.set("The provided item id does not exist.");
+            return Redirect::to("/prefill/add").into_response();
+        }
+    };
+
+    let item = item.set_img_path(file_name);
+
+    match Item::update(&state.pg_pool, &item).await {
+        Some(_) => {
+            flash.set("File saved successfully");
+            return Redirect::to("/").into_response();
+        }
+        None => {
+            flash.set("Something went wrong.");
+            return Redirect::to("/").into_response();
+        }
+    }
 }

@@ -35,6 +35,11 @@ impl Item {
         }
     }
 
+    pub fn set_img_path(mut self, img_path: String) -> Item {
+        self.img_path = Some(img_path);
+        return self;
+    }
+
     pub fn list_id(self) -> i32 {
         self.list_id
     }

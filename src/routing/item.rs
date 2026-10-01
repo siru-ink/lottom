@@ -294,7 +294,7 @@ pub async fn post_add_img(
         }
     };
 
-    let item = item.set_img_path(file_name);
+    let item = item.set_img_path(file_name).await;
 
     match Item::update(&state.pg_pool, &item).await {
         Some(_) => {

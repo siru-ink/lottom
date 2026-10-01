@@ -57,7 +57,9 @@ impl Item {
         }
     }
 
-    pub fn set_img_path(mut self, img_path: String) -> Item {
+    pub async fn set_img_path(mut self, img_path: String) -> Item {
+        self.remove_img_source().await;
+
         self.img_path = Some(img_path);
         return self;
     }
@@ -159,11 +161,15 @@ impl Item {
         ).fetch_optional(pool).await.ok()?
     }
 
-    pub async fn delete(pool: &PgPool, item: &Item) -> Result<(), SqlxError> {
-        if let Some(img_path) = item.img_path.as_ref() {
+    async fn remove_img_source(&self) {
+        if let Some(img_path) = self.img_path.as_ref() {
             let full_path = PathBuf::from("uploads").join(img_path);
             let _ = fs::remove_file(full_path).await;
         }
+    }
+
+    pub async fn delete(pool: &PgPool, item: &Item) -> Result<(), SqlxError> {
+        item.remove_img_source().await;
 
         match query!("DELETE FROM items WHERE id = $1", item.id)
             .execute(pool)

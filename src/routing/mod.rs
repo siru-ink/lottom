@@ -5,7 +5,7 @@ use crate::{
 };
 use axum::{
     Router,
-    extract::State,
+    extract::{DefaultBodyLimit, State},
     response::Response,
     routing::{get, post},
 };
@@ -36,7 +36,9 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         .route("/item/add", get(item::get_add).post(item::post_add))
         .route(
             "/item/img/add",
-            get(item::get_add_img).post(item::post_add_img),
+            get(item::get_add_img)
+                .post(item::post_add_img)
+                .layer(DefaultBodyLimit::max(10 * 1024 * 1024)),
         )
         .route("/item/img/get", get(item::get_img))
         .route(

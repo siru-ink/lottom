@@ -6,3 +6,6 @@
 
 # Local cargo configuration
 /.cargo/config.toml
+
+# Runtime uploads testing folder
+/uploads

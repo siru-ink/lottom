@@ -8,7 +8,8 @@ use axum::{
     extract::State,
     response::{IntoResponse, Redirect, Response},
 };
-use axum_extra::extract::Multipart;
+use axum_extra::extract::{Form, Multipart};
+use serde::Deserialize;
 use std::sync::Arc;
 
 pub async fn get_add(State(state): State<Arc<AppState>>, _user: AuthenticatedUser) -> Response {
@@ -120,6 +121,32 @@ pub async fn get_new(State(state): State<Arc<AppState>>, _user: AuthenticatedUse
     PrefillItemNewPage::show(&state.tera)
 }
 
-pub async fn post_new(_user: AuthenticatedUser) -> Response {
-    todo!()
+#[derive(Deserialize)]
+pub struct CreatePrefillItemForm {
+    en_name: String,
+    zh_name: String,
+    de_name: String,
+}
+
+pub async fn post_new(
+    State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
+    flash: Flash,
+    Form(form): Form<CreatePrefillItemForm>,
+) -> Response {
+    let item = PartialPrefillItem::new(form.en_name, form.zh_name, form.de_name);
+
+    let items = vec![item];
+
+    match PrefillItem::update_items(&state.pg_pool, items).await {
+        Ok(_) => {
+            flash.set("New prefill item created successfully.");
+            Redirect::to("/").into_response()
+        }
+        Err(e) => {
+            eprintln!("ERR: Failed to create new prefill item: {}", e);
+            flash.set("Creating new prefill item failed. Please try again.");
+            Redirect::to("/prefill/new").into_response()
+        }
+    }
 }

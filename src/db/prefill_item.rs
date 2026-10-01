@@ -19,6 +19,18 @@ pub struct PartialPrefillItem {
     pub cents_price_min: i32,
 }
 
+impl PartialPrefillItem {
+    pub fn new(en_name: String, zh_name: String, de_name: String) -> Self {
+        PartialPrefillItem {
+            en_name,
+            zh_name,
+            de_name,
+            cents_price_max: 1,
+            cents_price_min: 1,
+        }
+    }
+}
+
 impl PrefillItem {
     pub async fn update_items(
         pool: &PgPool,

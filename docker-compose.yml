@@ -17,6 +17,8 @@ services:
       POSTGRES_DATABASE_NAME: lottom_shard
       # Generate a secret key using e.g. `openssl rand -hex 32`
       COOKIEKEY: P31YCowDBtOOxe+YAQxkibdcDOVRyMhXEMe4LhFIEkHoMIT5P2z6Ii7xsuCLqhAVM6uaCrqJEJtm+PVaKVpakg==
+    volumes:
+      - appdata:/uploads
 
   db:
       image: postgres:18-alpine
@@ -36,3 +38,4 @@ services:
 
 volumes:
   data:
+  appdata:

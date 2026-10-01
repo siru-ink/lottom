@@ -2,7 +2,7 @@ use crate::{
     AppState,
     db::prefill_item::{PartialPrefillItem, PrefillItem},
     extractor::{auth::AuthenticatedUser, flash::Flash},
-    template::PrefillItemAddPage,
+    template::{PrefillItemAddPage, PrefillItemNewPage},
 };
 use axum::{
     extract::State,
@@ -114,4 +114,12 @@ fn parse_prefill_file(text: &str) -> Option<Vec<PartialPrefillItem>> {
     }
 
     Some(items)
+}
+
+pub async fn get_new(State(state): State<Arc<AppState>>, _user: AuthenticatedUser) -> Response {
+    PrefillItemNewPage::show(&state.tera)
+}
+
+pub async fn post_new(_user: AuthenticatedUser) -> Response {
+    todo!()
 }

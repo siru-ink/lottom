@@ -378,3 +378,21 @@ impl ItemAddImagePage {
         }
     }
 }
+
+pub struct PrefillItemNewPage {}
+
+impl PrefillItemNewPage {
+    pub fn show(tera: &Tera) -> Response {
+        let mut context = Context::new();
+
+        context.insert("pagenav", &true);
+
+        match tera.render("prefill_item_new.html", &context) {
+            Ok(page) => Html(page).into_response(),
+            Err(e) => {
+                println!("{}", e);
+                InternalServerErrorPage::new(tera).render()
+            }
+        }
+    }
+}

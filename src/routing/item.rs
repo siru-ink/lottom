@@ -13,10 +13,10 @@ use axum::{
 use axum_extra::extract::{Form, Multipart};
 use mime_guess::from_path;
 use serde::Deserialize;
-use std::{collections::HashMap, io::Write, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 use tokio::{
     fs::{self, File},
-    io::AsyncReadExt,
+    io::{AsyncReadExt, AsyncWriteExt},
 };
 use tokio_stream::StreamExt;
 use tokio_util::io::ReaderStream;
@@ -220,7 +220,7 @@ pub async fn post_add_img(
 
             let save_path = PathBuf::from("uploads/").join(&file_name);
 
-            let mut server_file = match File::create(&save_path) {
+            let mut server_file = match File::create(&save_path).await {
                 Ok(f) => f,
                 Err(_) => {
                     flash.set("Could not create new file on server.");
@@ -231,7 +231,7 @@ pub async fn post_add_img(
             loop {
                 match field.chunk().await {
                     Ok(Some(chunk)) => {
-                        if server_file.write_all(&chunk).is_err() {
+                        if server_file.write_all(&chunk).await.is_err() {
                             let _ = fs::remove_file(&save_path).await;
                             flash.set("Error writing to file on server.");
                             return Redirect::to("/").into_response();
@@ -246,7 +246,7 @@ pub async fn post_add_img(
                 }
             }
 
-            if server_file.flush().is_err() {
+            if server_file.flush().await.is_err() {
                 let _ = fs::remove_file(&save_path).await;
                 flash.set("Error writing to file on server.");
                 return Redirect::to("/").into_response();

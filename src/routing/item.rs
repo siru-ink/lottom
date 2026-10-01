@@ -1,8 +1,8 @@
 use crate::{
     AppState,
     db::{item::Item, list::List, prefill_item::PrefillItem},
-    extractor::auth::AuthenticatedUser,
-    template::{AddItemPage, InternalServerErrorPage, ItemPage, NotFoundPage},
+    extractor::{auth::AuthenticatedUser, flash::Flash},
+    template::{AddItemPage, InternalServerErrorPage, ItemAddImagePage, ItemPage, NotFoundPage},
 };
 use axum::{
     extract::{Query, State},
@@ -128,4 +128,38 @@ pub async fn post_add(
     }
 
     Redirect::to(&format!("/list?list_id={}", list.get_id())).into_response()
+}
+
+pub async fn get_add_img(
+    Query(params): Query<HashMap<String, String>>,
+    State(state): State<Arc<AppState>>,
+    _user: AuthenticatedUser,
+    flash: Flash,
+) -> Response {
+    let raw_item_id = match params.get("item_id") {
+        Some(id) => id,
+        None => {
+            flash.set("Error in url. To add image an item_id must be referenced in the url.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let item_id = match raw_item_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => {
+            flash
+                .set("Error in url. The provided item id could not be parsed into a number <i32>.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    let item = match Item::read(&state.pg_pool, item_id).await {
+        Some(item) => item,
+        None => {
+            flash.set("The provided item id did not reference an existing shopping list item.");
+            return Redirect::to("/").into_response();
+        }
+    };
+
+    ItemAddImagePage::show(&state.tera, &item)
 }

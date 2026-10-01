@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+
+{% block title %}List | {% endblock title %}
+
+{% block content %}
+<h2>Add Item Picture</h2>
+<p>
+    Please upload a picture to describe the selected item "{{ item.en_name }}".
+<p>
+<form action="/item/img/add" method="post" enctype="multipart/form-data" >
+    <input type="hidden" name="item_id" value="{{ item.id }}" />
+    <label for="item_image">Select Image:</label>
+    <input type="file" name="item_image" id="item_image" accept="image/*" required />
+    <br>
+    <button type="submit">Upload</button>
+</form>
+{% endblock content %}

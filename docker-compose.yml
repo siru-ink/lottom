@@ -15,7 +15,7 @@ services:
       POSTGRES_ADDRESS: db
       POSTGRES_PORT: 5432
       POSTGRES_DATABASE_NAME: lottom_shard
-      # Generate a secret key using e.g. `openssl rand -hex 32`
+      # Generate a secret key using e.g. `openssl rand -base64 64`
       COOKIEKEY: P31YCowDBtOOxe+YAQxkibdcDOVRyMhXEMe4LhFIEkHoMIT5P2z6Ii7xsuCLqhAVM6uaCrqJEJtm+PVaKVpakg==
     volumes:
       - appdata:/uploads

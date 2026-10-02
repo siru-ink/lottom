@@ -6,10 +6,11 @@ use crate::{
 use axum::{
     Router,
     extract::{DefaultBodyLimit, State},
-    response::Response,
+    response::{IntoResponse, Response},
     routing::{get, post},
 };
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
+use tokio::time::timeout;
 
 mod auth;
 mod item;
@@ -55,6 +56,7 @@ pub fn get_routes() -> Router<Arc<AppState>> {
         )
         .route("/prefill/export", get(prefill::get_export))
         .route("/", get(index))
+        .route("/healthcheck", get(healthcheck))
 }
 
 async fn index(
@@ -70,4 +72,17 @@ async fn index(
     };
 
     IndexPage::new(&state.tera, user.name(), user_lists, flash.get()).render()
+}
+
+async fn healthcheck(State(state): State<Arc<AppState>>) -> Response {
+    let db_check_result = timeout(
+        Duration::from_secs(3),
+        sqlx::query("SELECT 1;").execute(&state.pg_pool),
+    )
+    .await;
+
+    match db_check_result {
+        Ok(Ok(_)) => "ok".into_response(),
+        _ => "unhealth".into_response(),
+    }
 }

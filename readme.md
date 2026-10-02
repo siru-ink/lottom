@@ -20,6 +20,6 @@ Lottom as a docker container.
 | COOKIEKEY | Used to encrypte the cookies stored in the clients browser. Must be a hex encoded 256-bit key. Can be created using something like `openssl rand -hex 32`. |
 | POSTGRES_... | These are the standard environmental variables required for running a PostgreSQL database. More information can be found [here](https://hub.docker.com/_/postgres/).
 
-## Provenance
+## Lineage
 
 This project grew out of the now archived [Listy](https://code.siru.ink/siru-ink/listy) web server.

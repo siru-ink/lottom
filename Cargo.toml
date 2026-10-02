@@ -1,7 +1,14 @@
 [package]
 name = "lottom"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
+description = "Self-hostable grocery list app."
+readme = "readme.md"
+homepage = "https://grocery.siru.ink/"
+repository = "https://code.siru.ink/siru-ink/lottom"
+license-file = "license.md"
+keywords = ["webapp", "grocery"]
+publish = false
 
 [dependencies]
 argon2 = "0.6.0"

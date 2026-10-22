@@ -1,6 +1,9 @@
 use tower_cookies::{
     Cookie, Cookies,
-    cookie::{SameSite, time::Duration},
+    cookie::{
+        SameSite,
+        time::{Duration, OffsetDateTime},
+    },
 };
 
 #[derive(Debug)]
@@ -19,22 +22,27 @@ impl CookieValue {
 
     fn to_cookie(self) -> Cookie<'static> {
         let name = self.name();
+        let max_age = Duration::days(7);
+        let expires = OffsetDateTime::now_utc() + max_age;
+
         match self {
             CookieValue::SessionID(val) => Cookie::build((name, val.to_string()))
                 .domain("grocery.siru.ink")
                 .path("/")
                 .http_only(true)
-                .max_age(Duration::days(7))
+                .max_age(max_age)
+                .expires(expires)
                 .secure(true)
-                .same_site(SameSite::Strict)
+                .same_site(SameSite::Lax)
                 .build(),
             CookieValue::FlashMessage(mess) => Cookie::build((name, mess))
                 .domain("grocery.siru.ink")
                 .path("/")
                 .http_only(true)
-                .max_age(Duration::days(7))
+                .max_age(max_age)
+                .expires(expires)
                 .secure(true)
-                .same_site(SameSite::Strict)
+                .same_site(SameSite::Lax)
                 .build(),
         }
     }

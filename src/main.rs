@@ -63,5 +63,32 @@ async fn main() -> () {
 
     let listener = TcpListener::bind("0.0.0.0:80").await.unwrap();
 
-    serve(listener, app).await.unwrap();
+    serve(listener, app)
+        .with_graceful_shutdown(check_interupt())
+        .await
+        .unwrap();
+}
+
+async fn check_interupt() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to launch ctrl-c handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
 }

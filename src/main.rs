@@ -3,7 +3,6 @@ use sqlx::postgres::PgPool;
 use std::sync::{Arc, OnceLock};
 use tera::Tera;
 use tokio::{main, net::TcpListener};
-use tower::ServiceBuilder;
 use tower_cookies::{CookieManagerLayer, Key};
 
 mod cookies;
@@ -54,14 +53,21 @@ async fn main() -> () {
     });
 
     let app = routing::get_routes()
-        .layer(
-            ServiceBuilder::new()
-                .layer(from_fn(logging::logger))
-                .layer(CookieManagerLayer::new()),
-        )
+        .layer(CookieManagerLayer::new())
         .with_state(appstate);
 
-    let listener = TcpListener::bind("0.0.0.0:80").await.unwrap();
+    #[cfg(debug_assertions)]
+    let app = app.layer(from_fn(logging::logger));
+
+    #[cfg(not(debug_assertions))]
+    let listener = TcpListener::bind("0.0.0.0:80")
+        .await
+        .expect("Port 80 should allow binding a new listener");
+
+    #[cfg(debug_assertions)]
+    let listener = TcpListener::bind("127.0.0.1:8150")
+        .await
+        .expect("Port 8160 should allow binding a new listener");
 
     serve(listener, app)
         .with_graceful_shutdown(check_interupt())

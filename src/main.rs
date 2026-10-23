@@ -9,7 +9,6 @@ mod cookies;
 mod db;
 mod env;
 mod extractor;
-mod logging;
 mod routing;
 mod template;
 

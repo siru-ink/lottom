@@ -52,7 +52,7 @@ async fn main() -> () {
     let app = app.layer(axum::middleware::from_fn(logger));
 
     #[cfg(not(debug_assertions))]
-    let listener = TcpListener::bind("0.0.0.0:80")
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:80")
         .await
         .expect("Port 80 should allow binding a new listener");
 

@@ -2,74 +2,110 @@
 Cow milk | 牛奶 | Kuhmilch | 95 | 95
 Olive oil | 橄榄油 | Olivenöl | 695 | 695
 Olive oil 1l | 橄榄油1L | Olivenöl 1l | 695 | 695
-Avocado oil | 鳄梨油 | Avocadoöl | 1 | 1
+Avocado oil 250ml | 鳄梨油250ml | Avocadoöl 250ml | 549 | 549
 Ja milk drink (banana) | 香蕉牛奶 | Ja Milchdrink Banane | 89 | 89
 Orange juice nectar 1.5l | 橙汁饮料1.5L | Orangennektar 1.5l | 139 | 139
+Orange juice 1l | 橙汁1L | Orangensaft 1l | 139 | 139
 Tamari glutenfree soy sauce 1l | 无麸质酱油1L | Tamari glutenfreie Sojasoße 1l | 999 | 999
 Oat milk 1.5l | 燕麦奶1.5L | Hafermilch 1,5L | 349 | 349
 Powerade 1l | Powerade运动饮料1L | Powerade 1l | 199 | 199
+Powerade 0.5l | Powerade运动饮料0.5L | Powerade 0.5l | 159 | 159
 
 # Meats
-Chicken mortadella | 鸡肉莫塔德拉香肠 | Geflügel-Mortadella | 129 | 129
-Beef thin steaks | 薄切牛排 | Rinder-Minutensteaks | 599 | 599
-Chicken breast | 鸡胸肉 | Hühnerbrust | 699 | 699
+Beef ground meet 500g | 牛肉末500g | Rinderhackfleisch 500g | 899 | 698
 Beef soup meat | 牛肉 | Rindersuppenfleisch | 849 | 779
-Beef ground meet 500g | 牛肉末500g | Rinderhackfleisch 500g | 899 | 899
-Yuru spicy duck wings 20g | 裕如麻辣鸭翅20g | Yuru scharfe Entenflügel 20g | 399 | 399
-Salami | 萨拉米 | Salami | 299 | 299
+Beef thin steaks | 薄切牛排 | Rinder-Minutensteaks | 599 | 599
+Chicken breast | 鸡胸肉 | Hühnerbrust | 749 | 699
 Chicken breast filets | 鸡胸肉片 | Hähncheninnenfilets | 499 | 499
+Chicken mortadella | 鸡肉莫塔德拉香肠 | Geflügel-Mortadella | 129 | 129
+Salami | 萨拉米 | Salami | 299 | 169
+Yuru spicy duck wings 20g | 裕如麻辣鸭翅20g | Yuru scharfe Entenflügel 20g | 399 | 399
+Shrimp cooked | 熟虾 | Garnelen vorgekocht | 429 | 199
 
 # Fruits
+Applesauce 500g | 苹果酱500g | Apfelmus 500g | 239 | 239
 Banana | 香蕉 | Banane | 249 | 249
+Avocado | 鳄梨 | Avocado | 249 | 111
 
 # Vegetables
 Bell peppers | 甜椒 | Paprika | 299 | 229
-Mixed short chili peppers (red&green) 100g | 混合短辣椒（红&绿）100g | Gemischte kurze Chilishoten (rot&grün) 100g | 299 | 299
+Carrots | 胡萝卜 | Karotten | 129 | 129
+Mixed short chili peppers 100g | 混合短辣椒（红&绿）100g | Gemischte kurze Chilishoten 100g | 299 | 299
 Onions | 洋葱 | Zwiebeln | 199 | 199
-Iceberg lettuce | 卷心莴苣 | Eisbergsalat | 89 | 89
-Cucumber | 黄瓜 | Gurke | 119 | 119
+Iceberg lettuce | 卷心莴苣 | Eisbergsalat | 129 | 89
+Napa cabbage | 大白菜 | Chinakohl | 156 | 156
+Cucumber | 黄瓜 | Salatgurke | 119 | 99
 Green onions | 青葱 | Lauchzwiebeln | 59 | 59
-Celery | 芹菜 | Staudensellerie | 149 | 149
-Bean sprouts | 豆芽菜 | Sojabohnenkeime | 1 | 1
-Long Anaheim Peppers | 尖椒 | Anaheim-Pfeffer | 1 | 1
+Celery | 芹菜 | Staudensellerie | 149 | 99
+Mung bean sprouts 500g | 豆芽菜500g | Mungbohnensprossen 500g | 150 | 150
+Long Anaheim Peppers | 尖椒 | Anaheim-Chili | 299 | 299
+Cherry-Tomatos | 樱桃番茄 | Cherrytomaten | 329 | 329
 
 # Spices
 TanTanXiang chopped red chili peppers 425g | 坛坛乡精制剁辣椒425g | TanTanXiang gehackte rote Chilischoten 425g | 299 | 299
 Taco spice mix | 塔可调味粉 | Taco Würzmischung | 99 | 99
 Coriander | 香菜 | Koriander | 1 | 1
 Basil | 九层塔 | Basilikum | 1 | 1
+Tabasco sauce | 塔巴斯科辣酱 | Tabascosoße | 669 | 669
+Ginger 100g | 生姜100g | Ingwer 100g | 79 | 50
 
 # Cheeses
-Grana Padano ground cheese | 格拉纳帕达诺碎奶酪 | Grana Padano gerieben | 329 | 329
+Edamer sliced | 埃丹奶酪切片 | Edamer geschnitten | 245 | 245
+Gouda ground | 高达奶酪碎 | Gouda gerieben | 179 | 179
+Grana Padano ground | 格拉纳帕达诺碎奶酪 | Grana Padano gerieben | 329 | 329
+Parmigian Reggia ground | 帕马森雷吉亚诺碎奶酪 | Parmigian Reggia gerieben | 239 | 239
 
 # Sweets
+Chocolate ginger bread | 巧克力姜饼 | Schokolebkuchen | 369 | 369
 Marzipan loaf | 杏仁糖糕 | Marzipanbrot | 119 | 119
+Mini-double-cookies [raspberry] | 迷你双层饼干[覆盆子] | Minidoppelkekse [Himbeer] | 119 | 119
+Moon cake | 月饼 | Mondkuchen | 559 | 559
 Spekulaas | 香料斯佩库拉斯饼干 | Gewürzspekulatius | 169 | 169
+Soft cookies | 软饼干 | Weichkekse | 189 | 189
 
 # Breads
+Fresh egg waffles | 鸡蛋仔 | Frischeiwaffeln | 159 | 149
 Lye roll | 碱水小面包 | Laugenbrötchen | 39 | 39
 Pretzel stick | 椒盐脆饼棒 | Laugenstange | 59 | 59
 
-# Other
+# Noodles
+Luosifen noodle soup 300g | 螺蛳粉300G | Luosifen Nudelsuppe 300g | 329 | 263
+Luosifen noodle soup 400g | 螺蛳粉400G | Luosifen Nudelsuppe 400g | 359 | 287
+Spaghetti | 意大利面 | Spaghetti | 189 | 69
+(WGDC) instant ramen [beef] 5x100g | 五谷道场牛肉味方便面5x100g | (WGDC) Ramennudeln [Rind] 5x100g | 695 | 695
+(WUMU) instant ramen [beef] 5x100g | (WUMU)牛肉味方便面5x100g | (WUMU) Ramennudeln [Rind] 5x100g | 559 | 559
+Rice cake slices | 年糕 | Reiskuchenscheiben | 399 | 399
+Mung bean glass noodles | 绿豆粉丝 | Mungbohnen Glasnudeln | 199 | 199
+
+# Shrooms
 Chanterelle mushrooms | 鸡油菌 | Pfifferlinge | 479 | 479
-Tortilla chips (salt) | 盐味玉米片 | Totilla-Chips Salzgeschmack | 149 | 99
-Tortilla chips (cheese) | 芝士味玉米片 | Tortilla-Chips Käsegeschmack | 149 | 149
-Soy-Yoghurt Alpro Strawberry | Alpro草莓味豆酸奶 | Soja Joghurt Alpro Erdbeere | 219 | 219
-Soy-Yoghurt Alpro Natural | Alpro原味豆酸奶 | Soja Joghurt Alpro Natur | 219 | 219
-Soy-Yoghurt Alpro Peach | Alpro桃味豆酸奶 | Soja Joghurt Alpro Pfirsich | 219 | 219
-Greek Yoghurt Elinas Blueberry | Elinas蓝莓希腊酸奶 | Griechischer Joghurt Elinas Heidelbeere | 229 | 229
+Oyster muschrooms 200g | 平菇200g | Austernpilze 200g | 299 | 299
+
+# Other
+Tortilla chips [salt] | 盐味玉米片 | Totilla-Chips [Salz] | 149 | 99
+Tortilla chips [cheese] | 芝士味玉米片 | Tortilla-Chips [Käse] | 149 | 119
+(Alpro) Soy-Yoghurt [Strawberry] | (Alpro)草莓味豆酸奶 | (Alpro) Soja Joghurt [Erdbeere] | 219 | 219
+(Alpro) Soy-Yoghurt [Natural] | (Alpro)原味豆酸奶 | (Alpro) Soja Joghurt [Natur] | 219 | 219
+(Alpro) Soy-Yoghurt [Peach] | (Alpro)桃味豆酸奶 | (Alpro) Soja Joghurt [Pfirsich] | 219 | 219
+(Elinas) Greek Yoghurt [Blueberry] | (Elinas)蓝莓希腊酸奶 | (Elinas) Griechischer Joghurt [Heidelbeere] | 229 | 229
 Eggs 12pack | 12枚装鸡蛋 | Eier 12er Pack | 249 | 249
-Fresh egg waffles | 鸡蛋仔 | Frischeiwaffeln | 159 | 159
-WGDC instant ramen beef-flavored 5x100g | 五谷道场牛肉味方便面5x100g | WGDC Ramennudeln Rindfleischgeschmack 5x100g | 695 | 695
-Luosifen noodle soup 300g | 螺蛳粉300G | Luosifen Nudelsuppe 300g | 263 | 263
-Luosifen noodle soup 400g | 螺蛳粉400G | Luosifen Nudelsuppe 400g | 287 | 287
+Eggs 10pack | 10枚装鸡蛋 | Eier 10er Pack | 319 | 299
 Crunchy oat cereal | 脆脆燕麦片 | Knusper-Hafermüsli | 799 | 799
-Chocolate ginger bread | 巧克力姜饼 | Schokolebkuchen | 369 | 369
-Rice cake | 年糕 | Reiskuchen | 1 | 1
+Xylotol Sweetener 500g | 木糖醇甜味剂500g | Birkenzucker 500g | 365 | 365
+(Maggi) Soup Flavoring [Beef] | (Maggi)牛肉味汤料 | (Maggi) Brühemischung [Rind] | 229 | 229
+Matcha powder 150g | 抹茶粉150g | Matchapulver 150g | 799 | 799
+Lotus-root slices 1kg | 莲藕片1kg | Lotuswurzelscheiben 1kg | 499 | 499
+Rock sugar 400g | 冰糖400g | Kandiszucker 400g | 259 | 259
+Frozen pizza [salami] | 冷冻披萨[萨拉米] | Tiefkühlpizza [Salami] | 349 | 349
 
 # Non-foods
-Guhl shampoo | Guhl洗发水 | Guhl Antischuppenschampoo | 399 | 399
-Denkmit mild detergent | Denkmit温和洗衣液 | Denkmit Feinwaschmittel | 215 | 215
+(Guhl) shampoo [anti-dandruff] | (Guhl)洗发水[去屑] | (Guhl) Schampoo [Anti-Schuppen] | 399 | 399
+(Guhl) conditioner | (Guhl)护发素 | Guhl Spülung | 399 | 399
+(Guhl) conditioner [depth-builder] | (Guhl)护发素[深层修护] | (Guhl) Spülung [Tiefenaufbau] | 399 | 399
+(Denkmit) mild detergent | (Denkmit)温和洗衣液 | (Denkmit) Feinwaschmittel | 215 | 215
 Hair conditioner | 护发素 | Haar Spükung | 1 | 1
 Flosser | 牙线 | Zahnseide-sticks | 1 | 1
 Trash bag 35l | 垃圾袋35l | Müllbeutel 35l | 105 | 105
+Paper bag | 纸袋 | Papiertasche | 25 | 20
+(SOS) Plantar Wart Remover | (SOS)足底疣去除剂 | (SOS) Dornwarzen Entferner | 699 | 699
+#Fine-wire fuse 4A | 细线保险丝4A | Feinsicherung 4A | 239 | 239

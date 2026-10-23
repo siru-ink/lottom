@@ -17,11 +17,11 @@ Tamari glutenfree soy sauce 1l | 无麸质酱油1L | Tamari glutenfreie Sojasoß
 Beef ground meet 500g | 牛肉末500g | Rinderhackfleisch 500g | 899 | 698
 Beef soup meat | 牛肉 | Rindersuppenfleisch | 849 | 779
 Beef thin steaks | 薄切牛排 | Rinder-Minutensteaks | 599 | 599
-Beef gulash | ??? | Rindergulasch | 799 | 799
+Beef gulash | 牛肉炖菜 | Rindergulasch | 799 | 799
 Chicken breast | 鸡胸肉 | Hühnerbrust | 749 | 699
 Chicken breast filets | 鸡胸肉片 | Hähncheninnenfilets | 499 | 499
 Chicken mortadella | 鸡肉莫塔德拉香肠 | Geflügel-Mortadella | 129 | 129
-Lamb rolls 400g | ??? | Lammfleischrollen 400g | 799 | 799
+Lamb rolls 400g | 羊肉卷400g | Lammfleischrollen 400g | 799 | 799
 Salami | 萨拉米 | Salami | 299 | 169
 Yuru spicy duck wings 20g | 裕如麻辣鸭翅20g | Yuru scharfe Entenflügel 20g | 399 | 399
 Shrimp cooked | 熟虾 | Garnelen vorgekocht | 429 | 199
@@ -33,8 +33,8 @@ Avocado | 鳄梨 | Avocado | 249 | 111
 
 # Vegetables
 Bell peppers | 甜椒 | Paprika | 299 | 229
-Broccoli | ??? | Brokkoli | 119 | 119
-Cabage [white] | ??? | Weißkohl | 235 | 235
+Broccoli | 西兰花 | Brokkoli | 119 | 119
+Cabage [white] | 白卷心菜 | Weißkohl | 235 | 235
 Carrots | 胡萝卜 | Karotten | 179 | 129
 Celery | 芹菜 | Staudensellerie | 149 | 99
 Cherry-Tomatos | 樱桃番茄 | Cherrytomaten | 329 | 329
@@ -46,7 +46,7 @@ Mixed short chili peppers 100g | 混合短辣椒（红&绿）100g | Gemischte ku
 Mung bean sprouts 500g | 豆芽菜500g | Mungbohnensprossen 500g | 150 | 150
 Napa cabbage | 大白菜 | Chinakohl | 156 | 156
 Onions | 洋葱 | Zwiebeln | 199 | 149
-Potatos | ??? | Kartoffeln | 299 | 299
+Potatos | 土豆 | Kartoffeln | 299 | 299
 
 # Spices
 TanTanXiang chopped red chili peppers 425g | 坛坛乡精制剁辣椒425g | TanTanXiang gehackte rote Chilischoten 425g | 299 | 299
@@ -58,7 +58,7 @@ Ginger 100g | 生姜100g | Ingwer 100g | 79 | 50
 
 # Cheeses
 Edamer sliced | 埃丹奶酪切片 | Edamer geschnitten | 245 | 245
-Emmentaler sliced 250g | ??? | Emmentaler geschnitten | 229 | 229
+Emmentaler sliced 250g | 埃门塔尔奶酪切片250g | Emmentaler geschnitten | 229 | 229
 Gouda ground | 高达奶酪碎 | Gouda gerieben | 179 | 179
 Grana Padano ground | 格拉纳帕达诺碎奶酪 | Grana Padano gerieben | 329 | 329
 Parmigian Reggia ground | 帕马森雷吉亚诺碎奶酪 | Parmigian Reggia gerieben | 239 | 239
@@ -75,7 +75,7 @@ Soft cookies | 软饼干 | Weichkekse | 189 | 189
 Fresh egg waffles | 鸡蛋仔 | Frischeiwaffeln | 159 | 149
 Lye roll | 碱水小面包 | Laugenbrötchen | 39 | 39
 Pretzel stick | 椒盐脆饼棒 | Laugenstange | 59 | 59
-Pretzel sticks [frozen] | ??? | Laugenstange [gefroren] | 199 | 199
+Pretzel sticks [frozen] | 冷冻椒盐脆饼棒 | Laugenstange [gefroren] | 199 | 199
 
 # Noodles
 Luosifen noodle soup 300g | 螺蛳粉300G | Luosifen Nudelsuppe 300g | 329 | 263
@@ -89,7 +89,7 @@ Mung bean glass noodles | 绿豆粉丝 | Mungbohnen Glasnudeln | 199 | 199
 # Shrooms
 Chanterelle mushrooms | 鸡油菌 | Pfifferlinge | 479 | 399
 Oyster muschrooms 200g | 平菇200g | Austernpilze 200g | 299 | 299
-Button muschrooms | ??? | Champignionpilze | 149 | 149
+Button muschrooms | 白蘑菇 | Champignionpilze | 149 | 149
 
 # Other
 Tortilla chips [salt] | 盐味玉米片 | Totilla-Chips [Salz] | 149 | 99

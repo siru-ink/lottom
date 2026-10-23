@@ -67,7 +67,7 @@ impl PrefillItem {
     }
 
     pub async fn get_all(pool: &PgPool) -> Result<Vec<Self>, SqlxError> {
-        query_as!(PrefillItem, "SELECT * FROM prefill_items")
+        query_as!(PrefillItem, "SELECT * FROM prefill_items ORDER BY en_name")
             .fetch_all(pool)
             .await
     }

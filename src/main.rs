@@ -1,10 +1,3 @@
-use axum::{middleware::from_fn, serve};
-use sqlx::postgres::PgPool;
-use std::sync::{Arc, OnceLock};
-use tera::Tera;
-use tokio::{main, net::TcpListener};
-use tower_cookies::{CookieManagerLayer, Key};
-
 mod cookies;
 mod db;
 mod env;
@@ -13,13 +6,13 @@ mod routing;
 mod template;
 
 struct AppState {
-    pg_pool: PgPool,
-    tera: Tera,
+    pg_pool: sqlx::pool::Pool<sqlx::postgres::Postgres>,
+    tera: tera::Tera,
 }
 
-static COOKIEKEY: OnceLock<Key> = OnceLock::new();
+static COOKIEKEY: std::sync::OnceLock<tower_cookies::Key> = std::sync::OnceLock::new();
 
-#[main]
+#[tokio::main]
 async fn main() -> () {
     let config_values = match env::EnvConfig::setup() {
         Ok(val) => val,
@@ -29,7 +22,7 @@ async fn main() -> () {
         }
     };
 
-    if let Err(_) = COOKIEKEY.set(Key::from(&config_values.cookiekey)) {
+    if let Err(_) = COOKIEKEY.set(tower_cookies::Key::from(&config_values.cookiekey)) {
         println!("Error initializing encrypted cookies key.");
         return;
     }
@@ -42,21 +35,21 @@ async fn main() -> () {
         }
     };
 
-    let mut tera = Tera::default();
+    let mut tera = tera::Tera::default();
     tera.load_from_glob("templates/**/*.html")
         .expect("Tera should be able to load templates from <templates/>.");
 
-    let appstate = Arc::new(AppState {
+    let appstate = std::sync::Arc::new(AppState {
         pg_pool: pool,
         tera: tera,
     });
 
     let app = routing::get_routes()
-        .layer(CookieManagerLayer::new())
+        .layer(tower_cookies::CookieManagerLayer::new())
         .with_state(appstate);
 
     #[cfg(debug_assertions)]
-    let app = app.layer(from_fn(logger));
+    let app = app.layer(axum::middleware::from_fn(logger));
 
     #[cfg(not(debug_assertions))]
     let listener = TcpListener::bind("0.0.0.0:80")
@@ -64,11 +57,11 @@ async fn main() -> () {
         .expect("Port 80 should allow binding a new listener");
 
     #[cfg(debug_assertions)]
-    let listener = TcpListener::bind("127.0.0.1:8150")
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:8150")
         .await
         .expect("Port 8160 should allow binding a new listener");
 
-    serve(listener, app)
+    axum::serve(listener, app)
         .with_graceful_shutdown(check_interupt())
         .await
         .unwrap();

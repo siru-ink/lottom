@@ -57,7 +57,7 @@ async fn main() -> () {
         .with_state(appstate);
 
     #[cfg(debug_assertions)]
-    let app = app.layer(from_fn(logging::logger));
+    let app = app.layer(from_fn(logger));
 
     #[cfg(not(debug_assertions))]
     let listener = TcpListener::bind("0.0.0.0:80")
@@ -73,6 +73,15 @@ async fn main() -> () {
         .with_graceful_shutdown(check_interupt())
         .await
         .unwrap();
+}
+
+#[cfg(debug_assertions)]
+pub async fn logger(
+    request: axum::extract::Request,
+    next: axum::middleware::Next,
+) -> axum::response::Response {
+    println!("Serving {}", request.uri().to_string());
+    next.run(request).await
 }
 
 async fn check_interupt() {
